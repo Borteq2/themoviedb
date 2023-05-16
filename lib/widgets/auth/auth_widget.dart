@@ -163,7 +163,7 @@ class __FormWidgetState extends State<_FormWidget> {
         ),
         Row(
           children: [
-            TextButton(
+            ElevatedButton(
               style: ButtonStyle(
                 padding: MaterialStateProperty.all(
                     const EdgeInsets.symmetric(horizontal: 15, vertical: 8)),
