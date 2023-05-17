@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:themoviedb/widgets/main_screen/main_screen_widget.dart';
 
 import 'widgets/auth/auth_widget.dart';
 
@@ -17,9 +18,22 @@ class MyApp extends StatelessWidget {
         appBarTheme: const AppBarTheme(
           backgroundColor: Color.fromRGBO(3, 37, 65, 1),
         ),
-
       ),
-      home: AuthWidget(),
+      routes: {
+        '/auth': (context) => const AuthWidget(),
+        // '/main_screen': (context) => MainScreenWidget(),
+        '/main_screen': (context) => const MainScreenWidget(),
+      },
+      initialRoute: '/auth',
+      onGenerateRoute: (RouteSettings settings) {
+        return MaterialPageRoute(builder: (context) {
+          return const Scaffold(
+            body: Center(
+              child: Text('Ошибка навигации'),
+            ),
+          );
+        });
+      },
     );
   }
 }
