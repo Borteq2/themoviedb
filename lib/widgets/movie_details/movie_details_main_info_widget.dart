@@ -20,11 +20,11 @@ class MovieDetailsMainInfo extends StatelessWidget {
         _SummaryWidget(),
         Padding(
           padding: EdgeInsets.all(10.0),
-          child: _OverwierWidget(),
+          child: _OverviewWidget(),
         ),
         Padding(
           padding: EdgeInsets.all(10.0),
-          child: _DesctiptionWidget(),
+          child: _DescriptionWidget(),
         ),
         SizedBox(height: 30),
         _PeopleWidget(),
@@ -33,8 +33,8 @@ class MovieDetailsMainInfo extends StatelessWidget {
   }
 }
 
-class _DesctiptionWidget extends StatelessWidget {
-  const _DesctiptionWidget({
+class _DescriptionWidget extends StatelessWidget {
+  const _DescriptionWidget({
     super.key,
   });
 
@@ -52,8 +52,8 @@ class _DesctiptionWidget extends StatelessWidget {
   }
 }
 
-class _OverwierWidget extends StatelessWidget {
-  const _OverwierWidget({
+class _OverviewWidget extends StatelessWidget {
+  const _OverviewWidget({
     super.key,
   });
 
@@ -64,7 +64,7 @@ class _OverwierWidget extends StatelessWidget {
       style: TextStyle(
         color: Colors.white,
         fontSize: 16,
-        fontWeight: FontWeight.normal,
+        fontWeight: FontWeight.bold,
       ),
     );
   }
