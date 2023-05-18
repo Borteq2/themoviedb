@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import '../../resources/resources.dart';
 
 class Movie {
+  final int id;
   final String imageName;
   final String title;
   final String time;
   final String description;
 
   Movie({
+    required this.id,
     required this.imageName,
     required this.title,
     required this.time,
@@ -16,7 +18,6 @@ class Movie {
 }
 
 class MovieListWidget extends StatefulWidget {
-
   MovieListWidget({Key? key}) : super(key: key);
 
   @override
@@ -26,6 +27,7 @@ class MovieListWidget extends StatefulWidget {
 class _MovieListWidgetState extends State<MovieListWidget> {
   final _movies = [
     Movie(
+      id: 1,
       imageName: AppImages.man,
       title: 'Бессмертный',
       time: 'May 15, 2023',
@@ -33,6 +35,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
           'Понял, вы хотите узнать, как использовать контекстные действия (context actions) в Android Studio для проекта Flutter. Контекстные действия представляют собой быстры',
     ),
     Movie(
+      id: 2,
       imageName: AppImages.man,
       title: 'Жухлая яшперица',
       time: 'May 5, 2013',
@@ -40,6 +43,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
           'В приведенном примере класс MyClass имеет два поля: name и age, объявленные с ключевым словом final. Конструктор класса MyClass использует фигурные скобки ',
     ),
     Movie(
+      id: 3,
       imageName: AppImages.man,
       title: 'Огурцы',
       time: 'May 1, 2003',
@@ -47,6 +51,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
           'Таким образом, использование фигурных скобок и ключевого слова required в конструкторе класса позволяет создать именные и обязательные параметры, которые будут передаваться при создании экземпляра класса.',
     ),
     Movie(
+      id: 4,
       imageName: AppImages.man,
       title: 'Акулоторнадо',
       time: 'May 9, 1999',
@@ -54,6 +59,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
           'Генерация кода: Вы можете использовать контекстные действия для быстрой генерации кода. Например, если вы находитесь внутри класса и х',
     ),
     Movie(
+      id: 5,
       imageName: AppImages.man,
       title: 'Плейсхолдер',
       time: 'May 18, 2023',
@@ -82,6 +88,14 @@ class _MovieListWidgetState extends State<MovieListWidget> {
     _filteredMovies = _movies;
     _searchController.addListener(_searchMovies);
     super.initState();
+  }
+
+  void _onMovieTap(int index) {
+    final id = _movies[index].id;
+    Navigator.of(context).pushNamed(
+      '/main_screen/movie_details',
+      arguments: 'id',
+    );
   }
 
   @override
@@ -164,9 +178,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                         borderRadius: const BorderRadius.all(
                           Radius.circular(10),
                         ),
-                        onTap: () {
-                          print('11');
-                        },
+                        onTap: () => _onMovieTap(index),
                       ),
                     ),
                   ],
