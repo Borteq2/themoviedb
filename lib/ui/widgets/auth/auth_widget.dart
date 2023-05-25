@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/widgets/auth/auth_model.dart';
+import 'package:themoviedb/ui/widgets/auth/auth_model.dart';
 
 import '../../Theme/app_button_style.dart';
 

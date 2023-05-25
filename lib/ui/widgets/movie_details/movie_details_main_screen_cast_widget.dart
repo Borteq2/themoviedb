@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:themoviedb/resources/resources.dart';
 
-import '../../resources/resources.dart';
 
 class MovieDetailsMainScreenCastWidget extends StatelessWidget {
   const MovieDetailsMainScreenCastWidget({Key? key}) : super(key: key);
