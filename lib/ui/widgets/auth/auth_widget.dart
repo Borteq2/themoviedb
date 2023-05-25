@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:themoviedb/library/widgets/inherited/provider.dart';
+import 'package:themoviedb/ui/Theme/app_button_style.dart';
 import 'package:themoviedb/ui/widgets/auth/auth_model.dart';
-
-import '../../Theme/app_button_style.dart';
 
 class AuthWidget extends StatefulWidget {
   const AuthWidget({Key? key}) : super(key: key);
@@ -76,7 +76,7 @@ class _FormWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = AuthProvider.watch(context)?.model;
+    final model = NotifyProvider.read<AuthModel>(context);
     const textStyle = TextStyle(
       fontSize: 16,
       color: Color(0xff212529),
@@ -94,7 +94,7 @@ class _FormWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _ErrorMessageWidget(),
+        const _ErrorMessageWidget(),
         const Text(
           'Username',
           style: textStyle,
@@ -146,8 +146,8 @@ class _AuthButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Color(0xFF01B4E4);
-    final model = AuthProvider.watch(context)?.model;
+    const color = Color(0xFF01B4E4);
+    final model = NotifyProvider.watch<AuthModel>(context);
     final onPressed =
         model?.canStartAuth == true ? () => model?.auth(context) : null;
     final child = model?.isAuthProgress == true
@@ -182,8 +182,8 @@ class _ErrorMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final errorMessage = AuthProvider.watch(context)?.model.errorMessage;
-    if (errorMessage == null) return SizedBox.shrink();
+    final errorMessage = NotifyProvider.watch<AuthModel>(context)?.errorMessage;
+    if (errorMessage == null) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Text(

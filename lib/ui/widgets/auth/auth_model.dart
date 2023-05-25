@@ -9,13 +9,12 @@ class AuthModel extends ChangeNotifier {
   final _apiClient = ApiClient();
   final loginTextController = TextEditingController();
   final passwordTextController = TextEditingController();
+  final _sessionDataProvider = SessionDataProvider();
 
   String? _errorMessage;
   bool _isAuthProgress = false;
-  final _sessionDataProvider = SessionDataProvider();
 
   String? get errorMessage => _errorMessage;
-
   bool get canStartAuth => !_isAuthProgress;
 
   bool get isAuthProgress => _isAuthProgress;
@@ -61,26 +60,7 @@ class AuthModel extends ChangeNotifier {
   }
 }
 
-class AuthProvider extends InheritedNotifier {
-  final AuthModel model;
 
-  const AuthProvider({
-    Key? key,
-    required Widget child,
-    required this.model,
-  }) : super(
-          key: key,
-          notifier: model,
-          child: child,
-        );
 
-  static AuthProvider? watch(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<AuthProvider>();
-  }
 
-  static AuthProvider? read(BuildContext context) {
-    final widget =
-        context.getElementForInheritedWidgetOfExactType<AuthProvider>()?.widget;
-    return widget is AuthProvider ? widget : null;
-  }
-}
+
