@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:themoviedb/domain/api_client/api_client.dart';
@@ -15,6 +16,7 @@ class AuthModel extends ChangeNotifier {
   bool _isAuthProgress = false;
 
   String? get errorMessage => _errorMessage;
+
   bool get canStartAuth => !_isAuthProgress;
 
   bool get isAuthProgress => _isAuthProgress;
@@ -39,8 +41,18 @@ class AuthModel extends ChangeNotifier {
         username: login,
         password: password,
       );
-    } catch (e) {
-      _errorMessage = 'Неправильный логин / пароль!';
+    } on ApiClientException catch (e) {
+      switch (e.type) {
+        case ApiClientExceptionType.Network:
+          _errorMessage = 'Сервер недоступен, проверьте подключение к Интернет';
+          break;
+        case ApiClientExceptionType.Auth:
+          _errorMessage = 'Неверный логин или пароль';
+          break;
+        case ApiClientExceptionType.Other:
+          _errorMessage = 'Неожиданная ошибка, попробуйте ещё раз';
+          break;
+      }
     }
 
     _isAuthProgress = false;
@@ -55,12 +67,8 @@ class AuthModel extends ChangeNotifier {
     }
     await _sessionDataProvider.setSessionId(sessionId);
     unawaited(
-      Navigator.of(context).pushReplacementNamed(MainNavigationRouteNames.mainScreen),
+      Navigator.of(context)
+          .pushReplacementNamed(MainNavigationRouteNames.mainScreen),
     );
   }
 }
-
-
-
-
-
