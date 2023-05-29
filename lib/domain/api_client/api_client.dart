@@ -23,7 +23,6 @@ class ApiClient {
     required String username,
     required String password,
   }) async {
-
     final token = await _makeToken();
     final validatedToken = await _validateUser(
       username: username,
@@ -52,7 +51,6 @@ class ApiClient {
   ]) async {
     final url = _makeUri(path, parameters);
     try {
-
       final request = await _client.getUrl(url);
       final response = await request.close();
       final dynamic json = (await response.jsonDecode());
@@ -61,7 +59,6 @@ class ApiClient {
 
       final result = parser(json);
       return result;
-
     } on SocketException {
       throw ApiClientException(ApiClientExceptionType.Network);
     } on ApiClientException {
@@ -78,7 +75,6 @@ class ApiClient {
     Map<String, dynamic>? urlParameters,
   ]) async {
     try {
-
       final url = _makeUri(path, urlParameters);
       final request = await _client.postUrl(url);
 
@@ -92,7 +88,6 @@ class ApiClient {
 
       final result = parser(json);
       return result;
-
     } on SocketException {
       throw ApiClientException(ApiClientExceptionType.Network);
     } on ApiClientException {
@@ -103,7 +98,6 @@ class ApiClient {
   }
 
   Future<String> _makeToken() async {
-
     parser(dynamic json) {
       final jsonMap = json as Map<String, dynamic>;
       final token = jsonMap['request_token'] as String;
@@ -118,13 +112,32 @@ class ApiClient {
     return result;
   }
 
+  Future<dynamic> popularMovie(int page, String locale) async {
+    parser(dynamic json) {
+      // final jsonMap = json as Map<String, dynamic>;
+      // final token = jsonMap['request_token'] as String;
+      // return token;
+      return json;
+    }
+
+    final result = _get<dynamic>(
+      '/movie/popular',
+      parser,
+      <String, dynamic>{
+        'api_key': _apiKey,
+        'language': locale,
+        'page': page.toString(),
+      },
+    );
+    return result;
+  }
+
   Future<String> _validateUser({
     required String username,
     required String password,
     required String requestToken,
   }) async {
     try {
-
       parser(dynamic json) {
         final jsonMap = json as Map<String, dynamic>;
         final token = jsonMap['request_token'] as String;
@@ -144,7 +157,6 @@ class ApiClient {
         <String, dynamic>{'api_key': _apiKey},
       );
       return result;
-
     } on SocketException {
       throw ApiClientException(ApiClientExceptionType.Network);
     } on ApiClientException {
@@ -158,7 +170,6 @@ class ApiClient {
     required String requestToken,
   }) async {
     try {
-
       parser(dynamic json) {
         final jsonMap = json as Map<String, dynamic>;
         final sessionId = jsonMap['session_id'] as String;
@@ -173,7 +184,6 @@ class ApiClient {
         <String, dynamic>{'api_key': _apiKey},
       );
       return result;
-
     } on SocketException {
       throw ApiClientException(ApiClientExceptionType.Network);
     } on ApiClientException {
@@ -184,7 +194,6 @@ class ApiClient {
   }
 
   void _validateResponse(HttpClientResponse response, dynamic json) {
-
     if (response.statusCode == 401) {
       final dynamic status = json['status_code'];
       final code = status is int ? status : 0;
