@@ -8,9 +8,9 @@ class MovieDetailsMainInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         _TopPosterWidget(),
         Padding(
           padding: EdgeInsets.all(30.0),
@@ -87,7 +87,7 @@ class _PeopleWidget extends StatelessWidget {
       fontWeight: FontWeight.normal,
     );
 
-    return Column(
+    return const Column(
       children: [
         Row(
           mainAxisSize: MainAxisSize.max,
@@ -95,32 +95,32 @@ class _PeopleWidget extends StatelessWidget {
           children: [
             Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text('Stefano Sollima', style: nameStyle),
                   Text('Director', style: jobTitleStyle),
                 ]),
             Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text('Taylor Sheridan', style: nameStyle),
                   Text('Screenplay', style: jobTitleStyle),
                 ]),
           ],
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text('Tom Clancy', style: nameStyle),
                   Text('Novel', style: jobTitleStyle),
                 ]),
             Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text('Will Staples', style: nameStyle),
                   Text('Screenplay', style: jobTitleStyle),
                 ]),
@@ -228,8 +228,8 @@ class _TopPosterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: const [
+    return const Stack(
+      children: [
         Image(image: AssetImage(AppImages.topHeader)),
         Positioned(
             top: 20,

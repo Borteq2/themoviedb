@@ -48,18 +48,18 @@ class MovieDetailsMainScreenCastWidget extends StatelessWidget {
                                 offset: const Offset(0, 2))
                           ],
                         ),
-                        child: ClipRRect(
+                        child: const ClipRRect(
                           borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
+                              BorderRadius.all(Radius.circular(10)),
                           clipBehavior: Clip.hardEdge,
                           child: Column(
                             children: [
-                              const Image(image: AssetImage(AppImages.actor)),
+                              Image(image: AssetImage(AppImages.actor)),
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: EdgeInsets.all(8.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
+                                  children: [
                                     Text(
                                       'Michael B. Jordan',
                                       maxLines: 2,
