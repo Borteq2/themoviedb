@@ -1,115 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/resources/resources.dart';
-import 'package:themoviedb/ui/navigation/main_navigation.dart';
+import 'package:themoviedb/library/widgets/inherited/provider.dart';
+import 'package:themoviedb/ui/widgets/movie_list/movie_list_model.dart';
 
-class Movie {
-  final int id;
-  final String imageName;
-  final String title;
-  final String time;
-  final String description;
 
-  Movie({
-    required this.id,
-    required this.imageName,
-    required this.title,
-    required this.time,
-    required this.description,
-  });
-}
 
-class MovieListWidget extends StatefulWidget {
-  MovieListWidget({Key? key}) : super(key: key);
-
-  @override
-  State<MovieListWidget> createState() => _MovieListWidgetState();
-}
-
-class _MovieListWidgetState extends State<MovieListWidget> {
-  final _movies = [
-    Movie(
-      id: 1,
-      imageName: AppImages.man,
-      title: 'Бессмертный',
-      time: 'May 15, 2023',
-      description:
-          'Понял, вы хотите узнать, как использовать контекстные действия (context actions) в Android Studio для проекта Flutter. Контекстные действия представляют собой быстры',
-    ),
-    Movie(
-      id: 2,
-      imageName: AppImages.man,
-      title: 'Жухлая яшперица',
-      time: 'May 5, 2013',
-      description:
-          'В приведенном примере класс MyClass имеет два поля: name и age, объявленные с ключевым словом final. Конструктор класса MyClass использует фигурные скобки ',
-    ),
-    Movie(
-      id: 3,
-      imageName: AppImages.man,
-      title: 'Огурцы',
-      time: 'May 1, 2003',
-      description:
-          'Таким образом, использование фигурных скобок и ключевого слова required в конструкторе класса позволяет создать именные и обязательные параметры, которые будут передаваться при создании экземпляра класса.',
-    ),
-    Movie(
-      id: 4,
-      imageName: AppImages.man,
-      title: 'Акулоторнадо',
-      time: 'May 9, 1999',
-      description:
-          'Генерация кода: Вы можете использовать контекстные действия для быстрой генерации кода. Например, если вы находитесь внутри класса и х',
-    ),
-    Movie(
-      id: 5,
-      imageName: AppImages.man,
-      title: 'Плейсхолдер',
-      time: 'May 18, 2023',
-      description:
-          'Вот пример кода, показывающий, как сделать именные и обязательные параметры в конструкторе класса:',
-    ),
-  ];
-  var _filteredMovies = <Movie>[];
-
-  final _searchController = TextEditingController();
-
-  void _searchMovies() {
-    final query = _searchController.text;
-    if (query.isNotEmpty) {
-      _filteredMovies = _movies.where((Movie movie) {
-        return movie.title.toLowerCase().contains(query.toLowerCase());
-      }).toList();
-    } else {
-      _filteredMovies = _movies;
-    }
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    _filteredMovies = _movies;
-    _searchController.addListener(_searchMovies);
-    super.initState();
-  }
-
-  void _onMovieTap(int index) {
-    final id = _movies[index].id;
-    Navigator.of(context).pushNamed(
-      MainNavigationRouteNames.movieDetails,
-      arguments: id,
-    );
-  }
+class MovieListWidget extends StatelessWidget {
+  const MovieListWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
+    final model = NotifyProvider.watch<MovieListModel>(context);
+    if (model == null) return const SizedBox.shrink();
+
     return Stack(
       children: [
         ListView.builder(
-            padding: EdgeInsets.only(top: 70),
+            padding: const EdgeInsets.only(top: 70),
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            itemCount: _filteredMovies.length,
+            itemCount: model.movies.length,
             itemExtent: 163,
             itemBuilder: (BuildContext context, int index) {
-              final movie = _filteredMovies[index];
+
+              final movie = model.movies[index];
+              final posterPath = movie.posterPath;
 
               return Padding(
                 padding: const EdgeInsets.symmetric(
@@ -137,12 +51,13 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                       clipBehavior: Clip.hardEdge,
                       child: Row(
                         children: [
-                          Image(image: AssetImage(movie.imageName)),
+                          // Image(image: AssetImage(movie.imageName)),
                           const SizedBox(width: 15),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                const SizedBox(height: 20),
                                 Text(
                                   movie.title,
                                   style: const TextStyle(
@@ -153,7 +68,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
-                                  movie.time,
+                                  movie.releaseDate?.toString() ?? '1243141241',
                                   style: const TextStyle(
                                     color: Colors.grey,
                                   ),
@@ -162,7 +77,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                                 ),
                                 const SizedBox(height: 20),
                                 Text(
-                                  movie.description,
+                                  movie.overview,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 )
@@ -179,7 +94,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                         borderRadius: const BorderRadius.all(
                           Radius.circular(10),
                         ),
-                        onTap: () => _onMovieTap(index),
+                        onTap: () => model.onMovieTap(context, index),
                       ),
                     ),
                   ],
@@ -189,12 +104,11 @@ class _MovieListWidgetState extends State<MovieListWidget> {
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: TextField(
-            controller: _searchController,
             decoration: InputDecoration(
               labelText: 'Поиск',
               filled: true,
               fillColor: Colors.white.withAlpha(235),
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
             ),
           ),
         )

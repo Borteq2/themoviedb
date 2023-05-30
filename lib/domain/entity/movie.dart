@@ -6,8 +6,9 @@ part 'movie.g.dart';
 class Movie {
 
   final String? posterPath;
-  final int adult;
+  final bool adult;
   final String overview;
+  @JsonKey(fromJson: _parseDateFromString)
   final DateTime? releaseDate;
   final List<int> genre_ids;
   final int id;
@@ -36,5 +37,13 @@ class Movie {
     required this.video,
     required this.voteAverage,
   });
+
+  factory Movie.fromJson(Map<String, dynamic> json) => _$MovieFromJson(json);
+  Map<String, dynamic> toJson() => _$MovieToJson(this);
+
+  static DateTime? _parseDateFromString(String? rawDate) {
+    if (rawDate == null || rawDate.isEmpty) return null;
+    return DateTime.tryParse(rawDate);
+  }
 
 }

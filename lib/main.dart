@@ -11,5 +11,6 @@ void main() async {
   await model.checkAuth();
 
   final app = MyApp(model: model);
+
   runApp(app);
 }

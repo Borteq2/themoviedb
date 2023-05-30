@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:themoviedb/domain/data_providers/session_data_provider.dart';
 import 'package:themoviedb/library/widgets/inherited/provider.dart';
 import 'package:themoviedb/ui/widgets/main_screen/main_screen_model.dart';
+import 'package:themoviedb/ui/widgets/movie_list/movie_list_model.dart';
 import 'package:themoviedb/ui/widgets/movie_list/movie_list_widget.dart';
 
 class MainScreenWidget extends StatefulWidget {
@@ -13,6 +14,7 @@ class MainScreenWidget extends StatefulWidget {
 
 class _MainScreenWidgetState extends State<MainScreenWidget> {
   int _selectedTab = 0;
+  final movieListModel = MovieListModel();
 
   void onSelectTab(int index) {
     if (_selectedTab == index) return;
@@ -22,7 +24,15 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    movieListModel.loadMovies();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
+    // print(movieListModel.movies);
     final model = NotifyProvider.read<MainScreenModel>(context);
     return Scaffold(
       appBar: AppBar(
@@ -38,9 +48,9 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
       body: IndexedStack(
         index: _selectedTab,
         children: [
-          const Text('Новости'),
-          MovieListWidget(),
-          const Text('Сериалы'),
+          Text('Новости'),
+          NotifyProvider(model: movieListModel, child: MovieListWidget()),
+          Text('Сериалы'),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
