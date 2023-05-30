@@ -12,9 +12,12 @@ dependencies:
   flutter:
     sdk: flutter
   spider: 4.2.1
+  intl: ^0.18.0
   cupertino_icons: ^1.0.5
   json_annotation: ^4.8.1
   flutter_secure_storage: 8.0.0
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
