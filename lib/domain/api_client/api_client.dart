@@ -21,7 +21,7 @@ class ApiClient {
   static const _imageUrl = 'https://themoviedb.org/t/p/w220_and_h330_face';
   static const _apiKey = '7de4bbf87509e9f624318fde9b4b9e5d';
 
-  static String imageUrl(String path) => _imageUrl+path;
+  static String imageUrl(String path) => _imageUrl + path;
 
   Future<String> auth({
     required String username,
@@ -130,6 +130,28 @@ class ApiClient {
         'api_key': _apiKey,
         'language': locale,
         'page': page.toString(),
+      },
+    );
+    return result;
+  }
+
+  Future<PopularMovieResponse> searchMovie(
+      int page, String locale, String query) async {
+    parser(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final response = PopularMovieResponse.fromJson(jsonMap);
+      return response;
+    }
+
+    final result = _get(
+      '/search/movie',
+      parser,
+      <String, dynamic>{
+        'api_key': _apiKey,
+        'page': page.toString(),
+        'language': locale,
+        'query': query,
+        'include_adult': true.toString(),
       },
     );
     return result;
