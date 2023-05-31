@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:themoviedb/domain/entity/movie_date_parser.dart';
 
 part 'movie_details.g.dart';
 
@@ -19,7 +20,8 @@ class MovieDetails {
   final String? posterPath;
   final List<ProductionCompanie> productionCompanies;
   final List<ProductionCountrie> productionCountries;
-  final String releaseDate;
+  @JsonKey(fromJson: parseMovieDateFromString)
+  final DateTime? releaseDate;
   final int revenue;
   final int? runtime;
   final List<SpokenLanguage> spokenLanguages;
@@ -57,10 +59,10 @@ class MovieDetails {
     required this.voteAverage,
     required this.voteCount,
   });
-
   factory MovieDetails.fromJson(Map<String, dynamic> json) =>
       _$MovieDetailsFromJson(json);
   Map<String, dynamic> toJson() => _$MovieDetailsToJson(this);
+
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
