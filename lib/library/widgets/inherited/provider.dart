@@ -1,9 +1,68 @@
 import 'package:flutter/material.dart';
 
-class NotifyProvider<Model extends ChangeNotifier> extends InheritedNotifier {
-  final Model model;
+class NotifyProvider<Model extends ChangeNotifier> extends StatefulWidget {
+  final Model Function() create;
+  final bool isManagingModel;
+  final Widget child;
 
   const NotifyProvider({
+    Key? key,
+    required this.create,
+    this.isManagingModel = true,
+    required this.child,
+  }) : super(key: key);
+
+  @override
+  State<NotifyProvider> createState() => _NotifyProviderState<Model>();
+
+  static Model? watch<Model extends ChangeNotifier>(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<_InheritedNotifyProvider<Model>>()
+        ?.model;
+  }
+
+  static Model? read<Model extends ChangeNotifier>(BuildContext context) {
+    final widget = context
+        .getElementForInheritedWidgetOfExactType<
+            _InheritedNotifyProvider<Model>>()
+        ?.widget;
+    return widget is _InheritedNotifyProvider<Model> ? widget.model : null;
+  }
+}
+
+class _NotifyProviderState<Model extends ChangeNotifier>
+    extends State<NotifyProvider<Model>> {
+  late final Model _model;
+
+  @override
+  void initState() {
+    super.initState();
+    _model = widget.create();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _InheritedNotifyProvider(
+      model: _model,
+      child: widget.child,
+    );
+  }
+
+  @override
+  void dispose() {
+    if (widget.isManagingModel) {
+      _model.dispose();
+    }
+    _model.dispose();
+    super.dispose();
+  }
+}
+
+class _InheritedNotifyProvider<Model extends ChangeNotifier>
+    extends InheritedNotifier {
+  final Model model;
+
+  const _InheritedNotifyProvider({
     Key? key,
     required Widget child,
     required this.model,
@@ -12,19 +71,6 @@ class NotifyProvider<Model extends ChangeNotifier> extends InheritedNotifier {
           notifier: model,
           child: child,
         );
-
-  static Model? watch<Model extends ChangeNotifier>(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<NotifyProvider<Model>>()
-        ?.model;
-  }
-
-  static Model? read<Model extends ChangeNotifier>(BuildContext context) {
-    final widget = context
-        .getElementForInheritedWidgetOfExactType<NotifyProvider<Model>>()
-        ?.widget;
-    return widget is NotifyProvider<Model> ? widget.model : null;
-  }
 }
 
 class Provider<Model> extends InheritedWidget {
