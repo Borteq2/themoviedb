@@ -2,35 +2,35 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'movie_details.g.dart';
 
-@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
+@JsonSerializable(fieldRename: FieldRename.snake)
 class MovieDetails {
   final bool adult;
   final String? backdropPath;
   final String? belongsToCollection;
   final int budget;
-  final List<Genres> genres;
-  final String homepage;
+  final List<Genre> genres;
+  final String? homepage;
   final int id;
   final String? imdbId;
   final String originalLanguage;
   final String originalTitle;
   final String? overview;
-  final int popularity;
+  final double popularity;
   final String? posterPath;
-  final List<ProductionCompanies> productionCompanies;
-  final List<ProductionCountries> productionCountries;
+  final List<ProductionCompanie> productionCompanies;
+  final List<ProductionCountrie> productionCountries;
   final String releaseDate;
   final int revenue;
   final int? runtime;
-  final List<SpokenLanguages> spokenLanguages;
+  final List<SpokenLanguage> spokenLanguages;
   final String status;
-  final String? tagline;
+  final String tagline;
   final String title;
   final bool video;
   final double voteAverage;
-  final double voteCount;
+  final int voteCount;
 
-  const MovieDetails({
+  MovieDetails({
     required this.adult,
     required this.backdropPath,
     required this.belongsToCollection,
@@ -57,49 +57,71 @@ class MovieDetails {
     required this.voteAverage,
     required this.voteCount,
   });
+
+  factory MovieDetails.fromJson(Map<String, dynamic> json) =>
+      _$MovieDetailsFromJson(json);
+  Map<String, dynamic> toJson() => _$MovieDetailsToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class Genres {
+class Genre {
   final int id;
   final String name;
-
-  Genres({
+  Genre({
     required this.id,
     required this.name,
   });
 
+  factory Genre.fromJson(Map<String, dynamic> json) => _$GenreFromJson(json);
+  Map<String, dynamic> toJson() => _$GenreToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class ProductionCompanies {
+class ProductionCompanie {
   final int id;
-  final String? logoPath;
+  final String logoPath;
   final String name;
   final String originCountry;
-
-  ProductionCompanies({
+  ProductionCompanie({
     required this.id,
     required this.logoPath,
     required this.name,
     required this.originCountry,
   });
+
+  factory ProductionCompanie.fromJson(Map<String, dynamic> json) =>
+      _$ProductionCompanieFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductionCompanieToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class ProductionCountries {
-  @JsonKey(name: 'iso6391')
+class ProductionCountrie {
+  @JsonKey(name: 'iso_639_1')
   final String iso;
   final String name;
+  ProductionCountrie({
+    required this.iso,
+    required this.name,
+  });
 
-  ProductionCountries({required this.iso, required this.name});
+  factory ProductionCountrie.fromJson(Map<String, dynamic> json) =>
+      _$ProductionCountrieFromJson(json);
+  Map<String, dynamic> toJson() => _$ProductionCountrieToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class SpokenLanguages {
-  @JsonKey(name: 'iso6391')
+class SpokenLanguage {
+  final String englishName;
+  @JsonKey(name: 'iso_639_1')
   final String iso;
   final String name;
+  SpokenLanguage({
+    required this.englishName,
+    required this.iso,
+    required this.name,
+  });
 
-  SpokenLanguages({required this.iso, required this.name});
+  factory SpokenLanguage.fromJson(Map<String, dynamic> json) =>
+      _$SpokenLanguageFromJson(json);
+  Map<String, dynamic> toJson() => _$SpokenLanguageToJson(this);
 }
