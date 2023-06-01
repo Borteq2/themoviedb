@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:themoviedb/domain/api_client/api_client.dart';
+import 'package:themoviedb/library/widgets/inherited/provider.dart';
 import 'package:themoviedb/resources/resources.dart';
+import 'package:themoviedb/ui/widgets/movie_details/movie_details_model.dart';
 
 import '../user_rate_widget.dart';
 
@@ -93,18 +96,14 @@ class _PeopleWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Stefano Sollima', style: nameStyle),
-                  Text('Director', style: jobTitleStyle),
-                ]),
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Taylor Sheridan', style: nameStyle),
-                  Text('Screenplay', style: jobTitleStyle),
-                ]),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Stefano Sollima', style: nameStyle),
+              Text('Director', style: jobTitleStyle),
+            ]),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Taylor Sheridan', style: nameStyle),
+              Text('Screenplay', style: jobTitleStyle),
+            ]),
           ],
         ),
         SizedBox(height: 20),
@@ -112,18 +111,14 @@ class _PeopleWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Tom Clancy', style: nameStyle),
-                  Text('Novel', style: jobTitleStyle),
-                ]),
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Will Staples', style: nameStyle),
-                  Text('Screenplay', style: jobTitleStyle),
-                ]),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Tom Clancy', style: nameStyle),
+              Text('Novel', style: jobTitleStyle),
+            ]),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Will Staples', style: nameStyle),
+              Text('Screenplay', style: jobTitleStyle),
+            ]),
           ],
         ),
       ],
@@ -136,25 +131,31 @@ class _MovieNameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      maxLines: 3,
-      textAlign: TextAlign.center,
-      text: const TextSpan(children: [
-        TextSpan(
-          text: 'Tom Clancy`s Without Remorse',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 21,
+    final model = NotifyProvider.watch<MovieDetailsModel>(context);
+    var year = model?.movieDetails?.releaseDate?.year.toString();
+    year = year != null ? ' ($year)' : '';
+
+    return Center(
+      child: RichText(
+        maxLines: 3,
+        textAlign: TextAlign.center,
+        text: TextSpan(children: [
+          TextSpan(
+            text: model?.movieDetails?.title ?? '',
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 21,
+            ),
           ),
-        ),
-        TextSpan(
-          text: ' (2021)',
-          style: TextStyle(
-            fontWeight: FontWeight.normal,
-            fontSize: 17,
+          TextSpan(
+            text: year,
+            style: const TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 17,
+            ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 }
@@ -164,6 +165,8 @@ class _ScoreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final model = NotifyProvider.watch<MovieDetailsModel>(context);
+    model?.movieDetails?.voteAverage
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -228,15 +231,27 @@ class _TopPosterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Stack(
-      children: [
-        Image(image: AssetImage(AppImages.topHeader)),
-        Positioned(
+    final model = NotifyProvider.watch<MovieDetailsModel>(context);
+    final backdropPath = model?.movieDetails?.backdropPath;
+    final posterPath = model?.movieDetails?.posterPath;
+
+    return AspectRatio(
+      aspectRatio: 16/9,
+      child: Stack(
+        children: [
+          backdropPath != null
+              ? Image.network(ApiClient.imageUrlBackdrop(backdropPath))
+              : const SizedBox.shrink(),
+          Positioned(
             top: 20,
             left: 20,
             bottom: 20,
-            child: Image(image: AssetImage(AppImages.topHeaderSubImage))),
-      ],
+            child: posterPath != null
+                ? Image.network(ApiClient.imageUrlPoster(posterPath))
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
     );
   }
 }

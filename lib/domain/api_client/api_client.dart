@@ -19,10 +19,14 @@ class ApiClientException implements Exception {
 class ApiClient {
   final _client = HttpClient();
   static const _host = 'https://api.themoviedb.org/3';
-  static const _imageUrl = 'https://themoviedb.org/t/p/w220_and_h330_face';
+  static const _imageUrlBackdrop = 'https://themoviedb.org/t/p/w533_and_h300_bestv2';
+  static const _imageUrlPoster = 'https://themoviedb.org/t/p/w300_and_h450_bestv2';
+  static const _imageUrlList = 'https://themoviedb.org/t/p/w220_and_h330_face';
   static const _apiKey = '7de4bbf87509e9f624318fde9b4b9e5d';
 
-  static String imageUrl(String path) => _imageUrl + path;
+  static String imageUrlBackdrop(String path) => _imageUrlBackdrop + path;
+  static String imageUrlPoster(String path) => _imageUrlPoster + path;
+  static String imageUrlList(String path) => _imageUrlList + path;
 
   Future<String> auth({
     required String username,

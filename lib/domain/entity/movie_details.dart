@@ -104,7 +104,7 @@ class Genre {
 @JsonSerializable(fieldRename: FieldRename.snake)
 class ProductionCompanies {
   final int id;
-  final String logoPath;
+  final String? logoPath;
   final String name;
   final String originCountry;
 

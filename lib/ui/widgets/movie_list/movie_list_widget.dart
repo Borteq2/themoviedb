@@ -52,7 +52,7 @@ class MovieListWidget extends StatelessWidget {
                         children: [
                           posterPath != null
                               ? Image.network(
-                                  ApiClient.imageUrl(posterPath),
+                                  ApiClient.imageUrlList(posterPath),
                                   width: 95,
                                 )
                               : const SizedBox.shrink(),

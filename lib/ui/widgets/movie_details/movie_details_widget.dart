@@ -28,15 +28,9 @@ class _MovieDetailsWidgetState extends State<MovieDetailsWidget> {
         title: const _TitleWidget(),
         centerTitle: true,
       ),
-      body: ColoredBox(
-        color: const Color.fromRGBO(24, 23, 27, 1.0),
-        child: ListView(
-          children: const [
-            MovieDetailsMainInfo(),
-            SizedBox(height: 30),
-            MovieDetailsMainScreenCastWidget(),
-          ],
-        ),
+      body: const ColoredBox(
+        color: Color.fromRGBO(24, 23, 27, 1.0),
+        child: _BodyWidget(),
       ),
     );
   }
@@ -52,3 +46,24 @@ class _TitleWidget extends StatelessWidget {
   }
 }
 
+class _BodyWidget extends StatelessWidget {
+  const _BodyWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final model = NotifyProvider.watch<MovieDetailsModel>(context);
+    final movieDetails = model?.movieDetails;
+    if (movieDetails == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return ListView(
+      children: const [
+        MovieDetailsMainInfo(),
+        SizedBox(height: 30),
+        MovieDetailsMainScreenCastWidget(),
+      ],
+    );
+  }
+}
