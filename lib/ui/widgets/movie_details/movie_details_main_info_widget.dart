@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:themoviedb/domain/api_client/api_client.dart';
+import 'package:themoviedb/domain/entity/movie_details_credits.dart';
 import 'package:themoviedb/library/widgets/inherited/provider.dart';
-import 'package:themoviedb/resources/resources.dart';
 import 'package:themoviedb/ui/widgets/movie_details/movie_details_model.dart';
 
 import '../user_rate_widget.dart';
@@ -91,6 +90,19 @@ class _PeopleWidget extends StatelessWidget {
       fontSize: 16,
       fontWeight: FontWeight.normal,
     );
+
+    final model = NotifyProvider.watch<MovieDetailsModel>(context);
+    var crew = model?.movieDetails?.credits.crew;
+    if (crew == null || crew.isEmpty) return const SizedBox.shrink();
+    crew = crew.length > 4 ? crew.sublist(0, 3) : crew;
+
+    // bad part
+    var crewChunks = <List<Employee>>[];
+    for (var i = 0; i < crew.length; i += 2) {
+      crewChunks.add(
+        crew.sublist(i, i + 2 > crew.length ? crew.length : i + 2),
+      );
+    }
 
     return const Column(
       children: [
