@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:themoviedb/domain/api_client/api_client.dart';
 import 'package:themoviedb/domain/entity/movie_details_credits.dart';
 import 'package:themoviedb/library/widgets/inherited/provider.dart';
+import 'package:themoviedb/ui/navigation/main_navigation.dart';
 import 'package:themoviedb/ui/widgets/movie_details/movie_details_model.dart';
 
 import '../user_rate_widget.dart';
@@ -116,67 +117,76 @@ class _ScoreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final movieDetails = NotifyProvider.watch<MovieDetailsModel>(context);
-    var voteAverage = movieDetails?.movieDetails?.voteAverage ?? 0;
+    final movieDetails =
+        NotifyProvider.watch<MovieDetailsModel>(context)?.movieDetails;
+    var voteAverage = movieDetails?.voteAverage ?? 0;
     voteAverage = voteAverage * 10;
+    final videos = movieDetails?.videos.results
+        .where((video) => video.type == 'Trailer' && video.site == 'YouTube');
+    final trailerKey = videos?.isNotEmpty == true ? videos?.first.key : null;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Row(
-          children: [
-            SizedBox(
-              width: 40,
-              height: 40,
-              child: RadialPercentWidget(
-                percent: voteAverage / 100,
-                fillColor: const Color.fromARGB(255, 10, 23, 25),
-                lineColor: const Color.fromARGB(255, 37, 203, 103),
-                freeColor: const Color.fromARGB(255, 25, 54, 31),
-                lineWidth: 3,
-                child: Text(
-                  voteAverage.toStringAsFixed(0),
-                  style: const TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            TextButton(
-              onPressed: () {},
-              child: const Text(
-                'Рейтинг',
-                style: TextStyle(
+
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      Row(
+        children: [
+          SizedBox(
+            width: 40,
+            height: 40,
+            child: RadialPercentWidget(
+              percent: voteAverage / 100,
+              fillColor: const Color.fromARGB(255, 10, 23, 25),
+              lineColor: const Color.fromARGB(255, 37, 203, 103),
+              freeColor: const Color.fromARGB(255, 25, 54, 31),
+              lineWidth: 3,
+              child: Text(
+                voteAverage.toStringAsFixed(0),
+                style: const TextStyle(
                   color: Colors.white,
                 ),
               ),
             ),
-          ],
-        ),
-        Container(
-          width: 1,
-          height: 15,
-          color: Colors.grey,
-        ),
-        Row(
-          children: [
-            const Icon(
-              Icons.play_arrow,
-              color: Colors.white,
+          ),
+          const SizedBox(width: 10),
+          TextButton(
+            onPressed: () {},
+            child: const Text(
+              'Рейтинг',
+              style: TextStyle(
+                color: Colors.white,
+              ),
             ),
-            TextButton(
-                onPressed: () {},
-                child: const Text(
-                  'Трейлер',
-                  style: TextStyle(
-                    color: Colors.white,
+          ),
+        ],
+      ),
+      Container(
+        width: 1,
+        height: 15,
+        color: Colors.grey,
+      ),
+      trailerKey != null
+          ? TextButton(
+              onPressed: () {},
+              child: Row(children: [
+                const Icon(
+                  Icons.play_arrow,
+                  color: Colors.white,
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pushNamed(
+                    MainNavigationRouteNames.movieTrailerWidget,
+                    arguments: trailerKey,
                   ),
-                )),
-          ],
-        ),
-      ],
-    );
+                  child: const Text(
+                    'Play Trailer',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                )
+              ]),
+            )
+          : const SizedBox.shrink(),
+    ]);
   }
 }
 

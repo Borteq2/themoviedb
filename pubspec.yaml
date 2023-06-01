@@ -18,6 +18,7 @@ dependencies:
   flutter_secure_storage: 8.0.0
   flutter_localizations:
     sdk: flutter
+  youtube_player_flutter: ^8.1.2
 
 dev_dependencies:
   flutter_test:
