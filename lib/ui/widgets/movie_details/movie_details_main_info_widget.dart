@@ -30,7 +30,10 @@ class MovieDetailsMainInfo extends StatelessWidget {
           child: _DescriptionWidget(),
         ),
         SizedBox(height: 30),
-        _PeopleWidget(),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10.0),
+          child: _PeopleWidget(),
+        ),
       ],
     );
   }
@@ -70,72 +73,6 @@ class _OverviewWidget extends StatelessWidget {
         fontSize: 16,
         fontWeight: FontWeight.bold,
       ),
-    );
-  }
-}
-
-class _PeopleWidget extends StatelessWidget {
-  const _PeopleWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    const nameStyle = TextStyle(
-      color: Colors.white,
-      fontSize: 16,
-      fontWeight: FontWeight.normal,
-    );
-
-    const jobTitleStyle = TextStyle(
-      color: Colors.white,
-      fontSize: 16,
-      fontWeight: FontWeight.normal,
-    );
-
-    final model = NotifyProvider.watch<MovieDetailsModel>(context);
-    var crew = model?.movieDetails?.credits.crew;
-    if (crew == null || crew.isEmpty) return const SizedBox.shrink();
-    crew = crew.length > 4 ? crew.sublist(0, 3) : crew;
-
-    // bad part
-    var crewChunks = <List<Employee>>[];
-    for (var i = 0; i < crew.length; i += 2) {
-      crewChunks.add(
-        crew.sublist(i, i + 2 > crew.length ? crew.length : i + 2),
-      );
-    }
-
-    return const Column(
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Stefano Sollima', style: nameStyle),
-              Text('Director', style: jobTitleStyle),
-            ]),
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Taylor Sheridan', style: nameStyle),
-              Text('Screenplay', style: jobTitleStyle),
-            ]),
-          ],
-        ),
-        SizedBox(height: 20),
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Tom Clancy', style: nameStyle),
-              Text('Novel', style: jobTitleStyle),
-            ]),
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Will Staples', style: nameStyle),
-              Text('Screenplay', style: jobTitleStyle),
-            ]),
-          ],
-        ),
-      ],
     );
   }
 }
@@ -320,6 +257,89 @@ class _SummaryWidget extends StatelessWidget {
             fontSize: 21,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _PeopleWidget extends StatelessWidget {
+  const _PeopleWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final model = NotifyProvider.watch<MovieDetailsModel>(context);
+    var crew = model?.movieDetails?.credits.crew;
+    if (crew == null || crew.isEmpty) return const SizedBox.shrink();
+    crew = crew.length > 4 ? crew.sublist(0, 4) : crew;
+
+    // bad part
+    var crewChunks = <List<Employee>>[];
+    for (var i = 0; i < crew.length; i += 2) {
+      crewChunks.add(
+        crew.sublist(i, i + 2 > crew.length ? crew.length : i + 2),
+      );
+    }
+
+    return Column(
+        children: crewChunks
+            .map(
+              (chunk) => Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: _PeopleWidgetRow(employes: chunk),
+              ),
+            )
+            .toList());
+  }
+}
+
+class _PeopleWidgetRow extends StatelessWidget {
+  final List<Employee> employes;
+
+  const _PeopleWidgetRow({
+    Key? key,
+    required this.employes,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      // mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: employes
+          .map((employee) => _PeopleWidgetsRowItem(employee: employee))
+          .toList(),
+    );
+  }
+}
+
+class _PeopleWidgetsRowItem extends StatelessWidget {
+  final Employee employee;
+
+  const _PeopleWidgetsRowItem({
+    Key? key,
+    required this.employee,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    const nameStyle = TextStyle(
+      color: Colors.white,
+      fontSize: 16,
+      fontWeight: FontWeight.normal,
+    );
+    const jobTitleStyle = TextStyle(
+      color: Colors.white,
+      fontSize: 16,
+      fontWeight: FontWeight.normal,
+    );
+
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(employee.name, style: nameStyle),
+          Text(employee.job, style: jobTitleStyle),
+        ],
       ),
     );
   }
