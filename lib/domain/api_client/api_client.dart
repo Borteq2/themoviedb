@@ -8,6 +8,7 @@ enum ApiClientExceptionType {
   Network,
   Auth,
   Other,
+  SessionExpired,
 }
 
 enum MediaType { Movie, Tv }
@@ -210,6 +211,8 @@ class ApiClient {
 
       if (code == 30) {
         throw ApiClientException(ApiClientExceptionType.Auth);
+      } else if (code == 3) {
+        throw ApiClientException(ApiClientExceptionType.SessionExpired);
       } else {
         throw ApiClientException(ApiClientExceptionType.Other);
       }
@@ -301,6 +304,7 @@ class ApiClient {
       parser(dynamic json) {
         return 1;
       }
+
       final parameters = <String, dynamic>{
         'media_type': mediaType.asString(),
         'media_id': mediaId,
@@ -317,12 +321,11 @@ class ApiClient {
         },
       );
       return result;
-
     } on SocketException {
       throw ApiClientException(ApiClientExceptionType.Network);
     } on ApiClientException {
       rethrow;
-    } catch (_) {
+    } catch (e) {
       throw ApiClientException(ApiClientExceptionType.Other);
     }
   }

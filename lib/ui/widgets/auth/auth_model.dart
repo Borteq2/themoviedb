@@ -33,12 +33,10 @@ class AuthModel extends ChangeNotifier {
 
     _errorMessage = null;
     _isAuthProgress = true;
-
     notifyListeners();
 
     String? sessionId;
     int? accountId;
-
     try {
       sessionId = await _apiClient.auth(
         username: login,
@@ -57,6 +55,8 @@ class AuthModel extends ChangeNotifier {
         case ApiClientExceptionType.Other:
           _errorMessage = 'Неожиданная ошибка, попробуйте ещё раз';
           break;
+        case ApiClientExceptionType.SessionExpired:
+          print(e);
       }
     }
 
