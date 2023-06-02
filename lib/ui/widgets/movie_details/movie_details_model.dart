@@ -39,4 +39,22 @@ class MovieDetailsModel extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  Future<void> toggleFavorite() async {
+    final sessionId = await _sessionDataProvider.getSessionId();
+    final accountId = await _sessionDataProvider.getAccountId();
+
+    if (accountId == null || sessionId == null) return;
+
+    final newFavoriteValue = !_isFavorite;
+    _isFavorite = newFavoriteValue;
+    notifyListeners();
+    await _apiClient.markAsFavorite(
+      accountId: accountId,
+      sessionId: sessionId,
+      mediaType: MediaType.Movie,
+      mediaId: movieId,
+      isFavorite: newFavoriteValue,
+    );
+  }
 }

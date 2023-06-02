@@ -10,6 +10,19 @@ enum ApiClientExceptionType {
   Other,
 }
 
+enum MediaType { Movie, Tv }
+
+extension MediaTypeAsString on MediaType {
+  String asString() {
+    switch (this) {
+      case MediaType.Movie:
+        return 'movie';
+      case MediaType.Tv:
+        return 'tv';
+    }
+  }
+}
+
 class ApiClientException implements Exception {
   final ApiClientExceptionType type;
 
@@ -129,108 +142,31 @@ class ApiClient {
     return result;
   }
 
-  Future<int> getAccountInfo(
-      String sessionId,
-      ) async {
-    parser(dynamic json) {
-      final jsonMap = json as Map<String, dynamic>;
-      final result = jsonMap['id'] as int;
+  Future<String> _makeSession({
+    required String requestToken,
+  }) async {
+    try {
+      parser(dynamic json) {
+        final jsonMap = json as Map<String, dynamic>;
+        final sessionId = jsonMap['session_id'] as String;
+        return sessionId;
+      }
+
+      final parameters = <String, dynamic>{'request_token': requestToken};
+      final result = _post(
+        '/authentication/session/new',
+        parser,
+        parameters,
+        <String, dynamic>{'api_key': _apiKey},
+      );
       return result;
+    } on SocketException {
+      throw ApiClientException(ApiClientExceptionType.Network);
+    } on ApiClientException {
+      rethrow;
+    } catch (_) {
+      throw ApiClientException(ApiClientExceptionType.Other);
     }
-
-    final result = _get(
-      '/account',
-      parser,
-      <String, dynamic>{
-        'api_key': _apiKey,
-        'sessionId': sessionId,
-      },
-    );
-    return result;
-  }
-
-  Future<PopularMovieResponse> popularMovie(int page, String locale) async {
-    parser(dynamic json) {
-      final jsonMap = json as Map<String, dynamic>;
-      final response = PopularMovieResponse.fromJson(jsonMap);
-      return response;
-    }
-
-    final result = _get(
-      '/movie/popular',
-      parser,
-      <String, dynamic>{
-        'api_key': _apiKey,
-        'language': locale,
-        'page': page.toString(),
-      },
-    );
-    return result;
-  }
-
-  Future<MovieDetails> movieDetails(
-    int movieId,
-    String locale,
-  ) async {
-    parser(dynamic json) {
-      final jsonMap = json as Map<String, dynamic>;
-      final response = MovieDetails.fromJson(jsonMap);
-      return response;
-    }
-
-    final result = _get(
-      '/movie/$movieId',
-      parser,
-      <String, dynamic>{
-        'append_to_response': 'credits,videos',
-        'api_key': _apiKey,
-        'language': locale,
-      },
-    );
-    return result;
-  }
-
-  Future<bool> isFavorite(
-    int movieId,
-    String sessionId,
-  ) async {
-    parser(dynamic json) {
-      final jsonMap = json as Map<String, dynamic>;
-      final result = jsonMap['favorite'] as bool;
-      return result;
-    }
-
-    final result = _get(
-      '/movie/$movieId/account_states',
-      parser,
-      <String, dynamic>{
-        'api_key': _apiKey,
-        'session_id': sessionId,
-      },
-    );
-    return result;
-  }
-
-  Future<PopularMovieResponse> searchMovie(
-      int page, String locale, String query) async {
-    parser(dynamic json) {
-      final jsonMap = json as Map<String, dynamic>;
-      final response = PopularMovieResponse.fromJson(jsonMap);
-      return response;
-    }
-
-    final result = _get(
-      '/search/movie',
-      parser,
-      <String, dynamic>{
-        'api_key': _apiKey,
-        'page': page.toString(),
-        'language': locale,
-        'query': query,
-        'include_adult': true.toString(),
-      },
-    );
-    return result;
   }
 
   Future<String> _validateUser({
@@ -267,33 +203,6 @@ class ApiClient {
     }
   }
 
-  Future<String> _makeSession({
-    required String requestToken,
-  }) async {
-    try {
-      parser(dynamic json) {
-        final jsonMap = json as Map<String, dynamic>;
-        final sessionId = jsonMap['session_id'] as String;
-        return sessionId;
-      }
-
-      final parameters = <String, dynamic>{'request_token': requestToken};
-      final result = _post(
-        '/authentication/session/new',
-        parser,
-        parameters,
-        <String, dynamic>{'api_key': _apiKey},
-      );
-      return result;
-    } on SocketException {
-      throw ApiClientException(ApiClientExceptionType.Network);
-    } on ApiClientException {
-      rethrow;
-    } catch (_) {
-      throw ApiClientException(ApiClientExceptionType.Other);
-    }
-  }
-
   void _validateResponse(HttpClientResponse response, dynamic json) {
     if (response.statusCode == 401) {
       final dynamic status = json['status_code'];
@@ -305,6 +214,139 @@ class ApiClient {
         throw ApiClientException(ApiClientExceptionType.Other);
       }
     }
+  }
+
+  Future<int> getAccountInfo(String sessionId) async {
+    parser(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final result = jsonMap['id'] as int;
+      return result;
+    }
+
+    final result = _get(
+      '/account',
+      parser,
+      <String, dynamic>{
+        'api_key': _apiKey,
+        'session_id': sessionId,
+      },
+    );
+    return result;
+  }
+
+  Future<PopularMovieResponse> popularMovie(int page, String locale) async {
+    parser(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final response = PopularMovieResponse.fromJson(jsonMap);
+      return response;
+    }
+
+    final result = _get(
+      '/movie/popular',
+      parser,
+      <String, dynamic>{
+        'api_key': _apiKey,
+        'language': locale,
+        'page': page.toString(),
+      },
+    );
+    return result;
+  }
+
+  Future<MovieDetails> movieDetails(int movieId, String locale) async {
+    parser(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final response = MovieDetails.fromJson(jsonMap);
+      return response;
+    }
+
+    final result = _get(
+      '/movie/$movieId',
+      parser,
+      <String, dynamic>{
+        'append_to_response': 'credits,videos',
+        'api_key': _apiKey,
+        'language': locale,
+      },
+    );
+    return result;
+  }
+
+  Future<bool> isFavorite(int movieId, String sessionId) async {
+    parser(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final result = jsonMap['favorite'] as bool;
+      return result;
+    }
+
+    final result = _get(
+      '/movie/$movieId/account_states',
+      parser,
+      <String, dynamic>{
+        'api_key': _apiKey,
+        'session_id': sessionId,
+      },
+    );
+    return result;
+  }
+
+  Future<int> markAsFavorite({
+    required int accountId,
+    required String sessionId,
+    required MediaType mediaType,
+    required int mediaId,
+    required bool isFavorite,
+  }) async {
+    try {
+      parser(dynamic json) {
+        return 1;
+      }
+      final parameters = <String, dynamic>{
+        'media_type': mediaType.asString(),
+        'media_id': mediaId,
+        'favorite': isFavorite,
+      };
+
+      final result = _post(
+        '/account/$accountId/favorite',
+        parser,
+        parameters,
+        <String, dynamic>{
+          'api_key': _apiKey,
+          'session_id': sessionId,
+        },
+      );
+      return result;
+
+    } on SocketException {
+      throw ApiClientException(ApiClientExceptionType.Network);
+    } on ApiClientException {
+      rethrow;
+    } catch (_) {
+      throw ApiClientException(ApiClientExceptionType.Other);
+    }
+  }
+
+  Future<PopularMovieResponse> searchMovie(
+      int page, String locale, String query) async {
+    parser(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final response = PopularMovieResponse.fromJson(jsonMap);
+      return response;
+    }
+
+    final result = _get(
+      '/search/movie',
+      parser,
+      <String, dynamic>{
+        'api_key': _apiKey,
+        'page': page.toString(),
+        'language': locale,
+        'query': query,
+        'include_adult': true.toString(),
+      },
+    );
+    return result;
   }
 }
 
