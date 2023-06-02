@@ -125,7 +125,6 @@ class _ScoreWidget extends StatelessWidget {
         .where((video) => video.type == 'Trailer' && video.site == 'YouTube');
     final trailerKey = videos?.isNotEmpty == true ? videos?.first.key : null;
 
-
     return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
       Row(
         children: [
@@ -214,6 +213,18 @@ class _TopPosterWidget extends StatelessWidget {
                 ? Image.network(ApiClient.imageUrlPoster(posterPath))
                 : const SizedBox.shrink(),
           ),
+          Positioned(
+            top: 5,
+            right: 5,
+            child: IconButton(
+              onPressed: () {},
+              icon: Icon(
+                model?.isFavorite == true
+                    ? Icons.favorite
+                    : Icons.favorite_outline,
+              ),
+            ),
+          )
         ],
       ),
     );

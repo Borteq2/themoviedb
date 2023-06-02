@@ -36,11 +36,13 @@ class AuthModel extends ChangeNotifier {
     notifyListeners();
 
     String? sessionId;
+    int? accountId;
     try {
       sessionId = await _apiClient.auth(
         username: login,
         password: password,
       );
+      accountId = await _apiClient.getAccountInfo(sessionId);
     } on ApiClientException catch (e) {
       switch (e.type) {
         case ApiClientExceptionType.Network:
@@ -60,15 +62,14 @@ class AuthModel extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    if (sessionId == null) {
+    if (sessionId == null || accountId == null) {
       _errorMessage = 'Неизвестная ошибка';
       notifyListeners();
       return;
     }
     await _sessionDataProvider.setSessionId(sessionId);
-    unawaited(
-      Navigator.of(context)
-          .pushReplacementNamed(MainNavigationRouteNames.mainScreen),
-    );
+
+    Navigator.of(context)
+        .pushReplacementNamed(MainNavigationRouteNames.mainScreen);
   }
 }

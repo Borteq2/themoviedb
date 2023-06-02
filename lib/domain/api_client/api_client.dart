@@ -19,15 +19,21 @@ class ApiClientException implements Exception {
 class ApiClient {
   final _client = HttpClient();
   static const _host = 'https://api.themoviedb.org/3';
-  static const _imageUrlBackdrop = 'https://themoviedb.org/t/p/w533_and_h300_bestv2';
-  static const _imageUrlPoster = 'https://themoviedb.org/t/p/w300_and_h450_bestv2';
+  static const _imageUrlBackdrop =
+      'https://themoviedb.org/t/p/w533_and_h300_bestv2';
+  static const _imageUrlPoster =
+      'https://themoviedb.org/t/p/w300_and_h450_bestv2';
   static const _imageUrlList = 'https://themoviedb.org/t/p/w220_and_h330_face';
-  static const _imageUrlProfile = 'https://themoviedb.org/t/p/w138_and_h175_face';
+  static const _imageUrlProfile =
+      'https://themoviedb.org/t/p/w138_and_h175_face';
   static const _apiKey = '7de4bbf87509e9f624318fde9b4b9e5d';
 
   static String imageUrlBackdrop(String path) => _imageUrlBackdrop + path;
+
   static String imageUrlPoster(String path) => _imageUrlPoster + path;
+
   static String imageUrlList(String path) => _imageUrlList + path;
+
   static String imageUrlProfile(String path) => _imageUrlProfile + path;
 
   Future<String> auth({
@@ -123,6 +129,26 @@ class ApiClient {
     return result;
   }
 
+  Future<int> getAccountInfo(
+      String sessionId,
+      ) async {
+    parser(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final result = jsonMap['id'] as int;
+      return result;
+    }
+
+    final result = _get(
+      '/account',
+      parser,
+      <String, dynamic>{
+        'api_key': _apiKey,
+        'sessionId': sessionId,
+      },
+    );
+    return result;
+  }
+
   Future<PopularMovieResponse> popularMovie(int page, String locale) async {
     parser(dynamic json) {
       final jsonMap = json as Map<String, dynamic>;
@@ -159,6 +185,27 @@ class ApiClient {
         'append_to_response': 'credits,videos',
         'api_key': _apiKey,
         'language': locale,
+      },
+    );
+    return result;
+  }
+
+  Future<bool> isFavorite(
+    int movieId,
+    String sessionId,
+  ) async {
+    parser(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final result = jsonMap['favorite'] as bool;
+      return result;
+    }
+
+    final result = _get(
+      '/movie/$movieId/account_states',
+      parser,
+      <String, dynamic>{
+        'api_key': _apiKey,
+        'session_id': sessionId,
       },
     );
     return result;
