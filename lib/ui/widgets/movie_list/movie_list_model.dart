@@ -7,18 +7,35 @@ import 'package:themoviedb/domain/entity/movie.dart';
 import 'package:themoviedb/domain/entity/popular_movie_response.dart';
 import 'package:themoviedb/ui/navigation/main_navigation.dart';
 
-class MovieListModel extends ChangeNotifier {
+class MovieListRowData {
+  final int id;
+  final String title;
+  final String releaseDate;
+  final String overview;
+  final String? posterPath;
+
+  MovieListRowData({
+    required this.id,
+    required this.title,
+    required this.releaseDate,
+    required this.overview,
+    required this.posterPath,
+  });
+}
+
+class MovieListViewModel extends ChangeNotifier {
   final _apiClient = MovieApiClient();
-  final _movies = <Movie>[];
+  Timer? searchDebounce;
+  String _locale = '';
+  final _movies = <MovieListRowData>[];
   late int _currentPage;
   late int _totalPage;
   var _isLoadingInProgress = false;
   late DateFormat _dateFormat;
-  String _locale = '';
-  String? _searchQuery;
-  Timer? searchDebounce;
 
-  List<Movie> get movies => List.unmodifiable(_movies);
+  String? _searchQuery;
+
+  List<MovieListRowData> get movies => List.unmodifiable(_movies);
 
   String stringFromDate(DateTime? date) =>
       date != null ? _dateFormat.format(date) : '';
@@ -54,7 +71,8 @@ class MovieListModel extends ChangeNotifier {
       _isLoadingInProgress = true;
       final nextPage = _currentPage + 1;
       final moviesResponse = await _loadMovies(nextPage, _locale);
-      _movies.addAll(moviesResponse.movies);
+      _movies.addAll(moviesResponse.movies.map(_makeRowData).toList());
+      
       _currentPage = moviesResponse.page;
       _totalPage = moviesResponse.totalPages;
       _isLoadingInProgress = false;
@@ -62,6 +80,20 @@ class MovieListModel extends ChangeNotifier {
     } catch (e) {
       _isLoadingInProgress = false;
     }
+  }
+
+  MovieListRowData _makeRowData(Movie movie) {
+    final releaseDate = movie.releaseDate;
+    final releaseDateTitle =
+        releaseDate != null ? _dateFormat.format(releaseDate) : '';
+
+    return MovieListRowData(
+      id: movie.id,
+      title: movie.title,
+      releaseDate: releaseDateTitle,
+      overview: movie.overview,
+      posterPath: movie.posterPath,
+    );
   }
 
   void onMovieTap(BuildContext context, int index) {
