@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:themoviedb/domain/api_client/api_client.dart';
+import 'package:themoviedb/domain/api_client/api_client_exception.dart';
 import 'package:themoviedb/domain/services/auth_service.dart';
 import 'package:themoviedb/ui/navigation/main_navigation.dart';
 
@@ -27,13 +27,13 @@ class AuthViewModel extends ChangeNotifier {
       await _authService.login(login, password);
     } on ApiClientException catch (e) {
       switch (e.type) {
-        case ApiClientExceptionType.Network:
+        case ApiClientExceptionType.network:
           return 'Сервер недоступен, проверьте подключение к Интернет';
-        case ApiClientExceptionType.Auth:
+        case ApiClientExceptionType.auth:
           return 'Неверный логин или пароль';
-        case ApiClientExceptionType.Other:
+        case ApiClientExceptionType.other:
           return 'Неожиданная ошибка, попробуйте ещё раз';
-        case ApiClientExceptionType.SessionExpired:
+        case ApiClientExceptionType.sessionExpired:
           print(e);
       }
     } catch (e) {

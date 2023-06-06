@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:themoviedb/domain/api_client/api_client.dart';
+import 'package:themoviedb/domain/api_client/movie_api_client.dart';
 import 'package:themoviedb/domain/entity/movie.dart';
 import 'package:themoviedb/domain/entity/popular_movie_response.dart';
 import 'package:themoviedb/ui/navigation/main_navigation.dart';
 
 class MovieListModel extends ChangeNotifier {
-  final _apiClient = ApiClient();
+  final _apiClient = MovieApiClient();
   final _movies = <Movie>[];
   late int _currentPage;
   late int _totalPage;
