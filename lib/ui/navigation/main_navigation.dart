@@ -1,34 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/library/widgets/inherited/provider.dart';
-import 'package:themoviedb/ui/widgets/auth/auth_model.dart';
-import 'package:themoviedb/ui/widgets/auth/auth_widget.dart';
-import 'package:themoviedb/ui/widgets/main_screen/main_screen_model.dart';
-import 'package:themoviedb/ui/widgets/main_screen/main_screen_widget.dart';
-import 'package:themoviedb/ui/widgets/movie_details/movie_details_model.dart';
-import 'package:themoviedb/ui/widgets/movie_details/movie_details_widget.dart';
-import 'package:themoviedb/ui/widgets/movie_trailer/movie_trailer_widget.dart';
+import 'package:themoviedb/domain/factories/screen_factory.dart';
 
 abstract class MainNavigationRouteNames {
+  static const loaderWidget = '/';
   static const auth = 'auth';
-  static const mainScreen = '/';
+  static const mainScreen = '/main_screen';
   static const movieDetails = '/movie_details';
   static const movieTrailerWidget = '/movie_details/trailer';
 }
 
 class MainNavigation {
-  String initialRoute(bool isAuth) => isAuth
-      ? MainNavigationRouteNames.mainScreen
-      : MainNavigationRouteNames.auth;
+  static final _screenFactory = ScreenFactory();
 
   final routes = <String, Widget Function(BuildContext)>{
-    MainNavigationRouteNames.auth: (context) => NotifyProvider(
-          create: () => AuthModel(),
-          child: const AuthWidget(),
-        ),
-    MainNavigationRouteNames.mainScreen: (context) => NotifyProvider(
-          create: () => MainScreenModel(),
-          child: const MainScreenWidget(),
-        ),
+    MainNavigationRouteNames.loaderWidget: (_) => _screenFactory.makeLoader(),
+    MainNavigationRouteNames.auth: (_) => _screenFactory.makeAuth(),
+    MainNavigationRouteNames.mainScreen: (_) => _screenFactory.makeMainScreen(),
   };
 
   Route<Object> onGenerateRoute(RouteSettings settings) {
@@ -37,22 +24,20 @@ class MainNavigation {
         final arguments = settings.arguments;
         final movieId = arguments is int ? arguments : 0;
         return MaterialPageRoute(
-          builder: (context) => NotifyProvider(
-            create: () => MovieDetailsModel(movieId),
-            child: const MovieDetailsWidget(),
-          ),
-        );
+            builder: (_) => _screenFactory.makeMovieDetails(movieId));
       case MainNavigationRouteNames.movieTrailerWidget:
         final arguments = settings.arguments;
         final youTubeKey = arguments is String ? arguments : '';
         return MaterialPageRoute(
-          builder: (context) => MovieTrailerWidget(
-            youTubeKey: youTubeKey,
-          ),
-        );
+            builder: (_) => _screenFactory.makeMovieTrailer(youTubeKey));
       default:
         const widget = Text('Navigation error!');
-        return MaterialPageRoute(builder: (context) => widget);
+        return MaterialPageRoute(builder: (_) => widget);
     }
+  }
+
+  static void resetNavigation(BuildContext context) {
+    Navigator.of(context)
+        .pushReplacementNamed(MainNavigationRouteNames.loaderWidget);
   }
 }
