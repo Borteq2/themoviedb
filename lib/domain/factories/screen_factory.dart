@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:themoviedb/library/widgets/inherited/provider.dart'
-    as old_provider;
+
 import 'package:themoviedb/ui/loader/loader_view_model.dart';
 import 'package:themoviedb/ui/loader/loader_widget.dart';
 import 'package:themoviedb/ui/widgets/auth/auth_model.dart';
@@ -36,8 +35,8 @@ class ScreenFactory {
   }
 
   Widget makeMovieDetails(int movieId) {
-    return old_provider.NotifyProvider(
-      create: () => MovieDetailsModel(movieId),
+    return ChangeNotifierProvider(
+      create: (_) => MovieDetailsModel(movieId),
       child: const MovieDetailsWidget(),
     );
   }

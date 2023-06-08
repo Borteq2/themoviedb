@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/library/widgets/inherited/provider.dart';
+import 'package:provider/provider.dart';
 import 'package:themoviedb/ui/widgets/app/my_app_model.dart';
 import 'package:themoviedb/ui/widgets/movie_details/movie_details_model.dart';
 
@@ -20,16 +20,16 @@ class _MovieDetailsWidgetState extends State<MovieDetailsWidget> {
   @override
   void initState() {
     super.initState();
-    final model = NotifyProvider.read<MovieDetailsModel>(context);
-    final appModel = Provider.read<MyAppModel>(context);
-    model?.onSessionExpired = () => appModel?.resetSession(context);
+    final model = context.read<MovieDetailsModel>();
+    final appModel = context.read<MyAppModel>();
+    model.onSessionExpired = () => appModel.resetSession(context);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    NotifyProvider.read<MovieDetailsModel>(context)?.setupLocale(context);
+    context.read<MovieDetailsModel>().setupLocale(context);
   }
 
   @override
@@ -52,8 +52,8 @@ class _TitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifyProvider.watch<MovieDetailsModel>(context);
-    return Text(model?.movieDetails?.title ?? 'Загрузка...');
+    final model = context.watch<MovieDetailsModel>();
+    return Text(model.movieDetails?.title ?? 'Загрузка...');
   }
 }
 
@@ -62,8 +62,8 @@ class _BodyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifyProvider.watch<MovieDetailsModel>(context);
-    final movieDetails = model?.movieDetails;
+    final model = context.watch<MovieDetailsModel>();
+    final movieDetails = model.movieDetails;
     if (movieDetails == null) {
       return const Center(
         child: CircularProgressIndicator(),
