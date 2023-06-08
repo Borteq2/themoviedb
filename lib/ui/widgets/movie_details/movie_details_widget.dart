@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:themoviedb/ui/widgets/app/my_app_model.dart';
 import 'package:themoviedb/ui/widgets/movie_details/movie_details_model.dart';
-
-import 'movie_details_main_info_widget.dart';
-import 'movie_details_main_screen_cast_widget.dart';
+import 'package:themoviedb/ui/widgets/movie_details/movie_details_main_info_widget.dart';
+import 'package:themoviedb/ui/widgets/movie_details/movie_details_main_screen_cast_widget.dart';
 
 class MovieDetailsWidget extends StatefulWidget {
   const MovieDetailsWidget({
