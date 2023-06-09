@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:themoviedb/ui/widgets/app/my_app_model.dart';
 import 'package:themoviedb/ui/widgets/movie_details/movie_details_model.dart';
 import 'package:themoviedb/ui/widgets/movie_details/movie_details_main_info_widget.dart';
 import 'package:themoviedb/ui/widgets/movie_details/movie_details_main_screen_cast_widget.dart';
@@ -17,18 +16,11 @@ class MovieDetailsWidget extends StatefulWidget {
 class _MovieDetailsWidgetState extends State<MovieDetailsWidget> {
 
   @override
-  void initState() {
-    super.initState();
-    final model = context.read<MovieDetailsModel>();
-    final appModel = context.read<MyAppModel>();
-    model.onSessionExpired = () => appModel.resetSession(context);
-  }
-
-  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    context.read<MovieDetailsModel>().setupLocale(context);
+    Future.microtask(
+      () => context.read<MovieDetailsModel>().setupLocale(context),
+    );
   }
 
   @override
@@ -51,8 +43,8 @@ class _TitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.watch<MovieDetailsModel>();
-    return Text(model.movieDetails?.title ?? 'Загрузка...');
+    final title = context.select((MovieDetailsModel model) => model.data.title);
+    return Text(title);
   }
 }
 
@@ -61,16 +53,16 @@ class _BodyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.watch<MovieDetailsModel>();
-    final movieDetails = model.movieDetails;
-    if (movieDetails == null) {
+    final isLoading =
+        context.select((MovieDetailsModel model) => model.data.isLoading);
+    if (isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
     return ListView(
       children: const [
-        MovieDetailsMainInfo(),
+        MovieDetailsMainInfoWidget(),
         SizedBox(height: 30),
         MovieDetailsMainScreenCastWidget(),
       ],
