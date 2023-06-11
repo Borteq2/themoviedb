@@ -1,32 +1,103 @@
+import 'package:bloc/bloc.dart';
 import 'package:themoviedb/domain/api_client/account_api_client.dart';
 import 'package:themoviedb/domain/api_client/auth_api_client.dart';
 import 'package:themoviedb/domain/data_providers/session_data_provider.dart';
 
-class AuthService {
-  final _authApiClient = AuthApiClient();
-  final _accountApiClient = AccountApiClient();
-  final _sessionDataProvider = SessionDataProvider();
+abstract class AuthEvent {}
 
-  Future<bool> isAuth() async {
-    final sessionId = await _sessionDataProvider.getSessionId();
-    final isAuth = sessionId != null;
-    return isAuth;
-  }
+class AuthCheckStatusEvent extends AuthEvent {}
 
-  Future<void> login(String login, String password) async {
-    final sessionId = await _authApiClient.auth(
-      username: login,
-      password: password,
-    );
-    final accountId = await _accountApiClient.getAccountInfo(sessionId);
+class AuthLogoutEvent extends AuthEvent {}
 
-    await _sessionDataProvider.setSessionId(sessionId);
-    await _sessionDataProvider.setAccountId(accountId);
-  }
+class AuthLoginEvent extends AuthEvent {
+  final String login;
+  final String password;
 
-  Future<void> logout() async{
-    await _sessionDataProvider.deleteSessionId();
-    await _sessionDataProvider.deleteAccountId();
+  AuthLoginEvent({
+    required this.login,
+    required this.password,
+  });
+}
 
+enum AuthStateStatus { authorized, notAuthorized, inProgress }
+
+abstract class AuthState {}
+
+class AuthUnauthorizedState extends AuthState {}
+
+class AuthAuthorizedState extends AuthState {}
+
+class AuthFailureState extends AuthState {
+  final Object error;
+
+  AuthFailureState(this.error);
+}
+
+class AuthInProgressState extends AuthState {}
+
+class AuthBloc extends Bloc<AuthEvent, AuthState> {
+  AuthBloc(AuthState initialState) : super(initialState) {
+    final _authApiClient = AuthApiClient();
+    final _accountApiClient = AccountApiClient();
+    final _sessionDataProvider = SessionDataProvider();
+
+    on<AuthCheckStatusEvent>((event, emit) async {
+      final sessionId = await _sessionDataProvider.getSessionId();
+      final newState =
+          sessionId != null ? AuthAuthorizedState() : AuthUnauthorizedState();
+      emit(newState);
+    });
+    on<AuthLoginEvent>((event, emit) async {
+      try {
+        final sessionId = await _authApiClient.auth(
+          username: event.login,
+          password: event.password,
+        );
+        final accountId = await _accountApiClient.getAccountInfo(sessionId);
+
+        await _sessionDataProvider.setSessionId(sessionId);
+        await _sessionDataProvider.setAccountId(accountId);
+        emit(AuthAuthorizedState());
+      } catch (e) {
+        emit(AuthFailureState(e));
+      }
+    });
+    on<AuthLogoutEvent>((event, emit) async {
+      try {
+        await _sessionDataProvider.deleteSessionId();
+        await _sessionDataProvider.deleteAccountId();
+      } catch (e) {
+        emit(AuthFailureState(e));
+      }
+    });
+    add(AuthCheckStatusEvent());
   }
 }
+
+// class AuthService {
+//   final _authApiClient = AuthApiClient();
+//   final _accountApiClient = AccountApiClient();
+//   final _sessionDataProvider = SessionDataProvider();
+//
+//   Future<bool> isAuth() async {
+//     final sessionId = await _sessionDataProvider.getSessionId();
+//     final isAuth = sessionId != null;
+//     return isAuth;
+//   }
+//
+//   Future<void> login(String login, String password) async {
+//     final sessionId = await _authApiClient.auth(
+//       username: login,
+//       password: password,
+//     );
+//     final accountId = await _accountApiClient.getAccountInfo(sessionId);
+//
+//     await _sessionDataProvider.setSessionId(sessionId);
+//     await _sessionDataProvider.setAccountId(accountId);
+//   }
+//
+//   Future<void> logout() async {
+//     await _sessionDataProvider.deleteSessionId();
+//     await _sessionDataProvider.deleteAccountId();
+//   }
+// }
