@@ -1,24 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:themoviedb/ui/Theme/app_button_style.dart';
-import 'package:themoviedb/ui/widgets/auth/auth_model.dart';
+import 'package:themoviedb/ui/navigation/main_navigation.dart';
+import 'package:themoviedb/ui/widgets/auth/auth_view_cubit.dart';
+import 'package:themoviedb/ui/widgets/loader/loader_view_cubit.dart';
 
 class AuthWidget extends StatelessWidget {
   const AuthWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login to your account'),
-        centerTitle: true,
-      ),
-      body: ListView(
-        children: const [
-          _HeaderWidget(),
-        ],
+    return BlocListener<AuthViewCubit, AuthViewCubitState>(
+      listener: _onAuthViewCubitStateChange,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Login to your account'),
+          centerTitle: true,
+        ),
+        body: ListView(
+          children: const [
+            _HeaderWidget(),
+          ],
+        ),
       ),
     );
+  }
+  void _onAuthViewCubitStateChange(
+      BuildContext context,
+      AuthViewCubitState state,
+      ) {
+    if (state is AuthViewCubitSuccessAuthState) {
+      MainNavigation.resetNavigation(context);
+    }
   }
 }
 

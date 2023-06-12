@@ -74,12 +74,12 @@ class AuthInProgressState extends AuthState {
   int get hashCode => 0;
 }
 
-class AuthCheckInProgressState extends AuthState {
+class AuthCheckStatusInProgressState extends AuthState {
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is AuthCheckInProgressState && runtimeType == other.runtimeType;
+          other is AuthCheckStatusInProgressState && runtimeType == other.runtimeType;
 
   @override
   int get hashCode => 0;
