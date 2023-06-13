@@ -5,6 +5,8 @@ import 'package:themoviedb/domain/data_providers/session_data_provider.dart';
 import 'package:themoviedb/domain/entity/popular_movie_response.dart';
 import 'package:themoviedb/domain/local_entity/movie_details_local.dart';
 
+
+
 class MovieService {
   final _sessionDataProvider = SessionDataProvider();
   final _movieApiClient = MovieApiClient();
