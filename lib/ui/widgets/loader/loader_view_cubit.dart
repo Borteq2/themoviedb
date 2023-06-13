@@ -13,9 +13,13 @@ class LoaderViewCubit extends Cubit<LoaderViewCubitState> {
     LoaderViewCubitState initialState,
     this.authBloc,
   ) : super(initialState) {
-    authBloc.add(AuthCheckStatusEvent());
-    _onState(authBloc.state);
-    authBlocSubscription = authBloc.stream.listen(_onState);
+    Future.microtask(
+      () {
+        _onState(authBloc.state);
+        authBlocSubscription = authBloc.stream.listen(_onState);
+        authBloc.add(AuthCheckStatusEvent());
+      },
+    );
   }
 
   void _onState(AuthState state) {
@@ -32,4 +36,3 @@ class LoaderViewCubit extends Cubit<LoaderViewCubitState> {
     return super.close();
   }
 }
-

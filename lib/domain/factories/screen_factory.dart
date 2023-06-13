@@ -27,7 +27,7 @@ class ScreenFactory {
         LoaderViewCubitState.unknown,
         authBloc,
       ),
-      lazy: false,
+      // lazy: false,
       child: const LoaderWidget(),
     );
   }
