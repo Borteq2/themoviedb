@@ -1,11 +1,19 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:themoviedb/configuration/configuration.dart';
 import 'package:themoviedb/domain/api_client/movie_api_client.dart';
 import 'package:themoviedb/domain/entity/movie.dart';
+import 'package:themoviedb/domain/entity/popular_movie_response.dart';
 
 abstract class MovieListEvent {}
 
-class MovieListEventLoadNextPage extends MovieListEvent {}
+class MovieListEventLoadNextPage extends MovieListEvent {
+  final String locale;
+
+  MovieListEventLoadNextPage(this.locale);
+}
 
 class MovieListEventLoadReset extends MovieListEvent {}
 
@@ -32,6 +40,28 @@ class MovieListContainer {
     required this.currentPage,
     required this.totalPage,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MovieListContainer &&
+          runtimeType == other.runtimeType &&
+          movies == other.movies;
+
+  @override
+  int get hashCode => movies.hashCode;
+
+  MovieListContainer copyWith({
+    List<Movie>? movies,
+    int? currentPage,
+    int? totalPage,
+  }) {
+    return MovieListContainer(
+      movies: movies ?? this.movies,
+      currentPage: currentPage ?? this.currentPage,
+      totalPage: totalPage ?? this.totalPage,
+    );
+  }
 }
 
 class MovieListState {
@@ -51,6 +81,29 @@ class MovieListState {
     required this.searchMovieContainer,
     required this.searchQuery,
   });
+
+  MovieListState copyWith({
+    MovieListContainer? popularMovieContainer,
+    MovieListContainer? searchMovieContainer,
+    String? searchQuery,
+  }) {
+    return MovieListState(
+      popularMovieContainer:
+          popularMovieContainer ?? this.popularMovieContainer,
+      searchMovieContainer: searchMovieContainer ?? this.searchMovieContainer,
+      searchQuery: searchQuery ?? this.searchQuery,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MovieListState &&
+          runtimeType == other.runtimeType &&
+          searchMovieContainer == other.searchMovieContainer;
+
+  @override
+  int get hashCode => searchMovieContainer.hashCode;
 }
 
 class MovieListBloc extends Bloc<MovieListEvent, MovieListState> {
@@ -61,11 +114,11 @@ class MovieListBloc extends Bloc<MovieListEvent, MovieListState> {
     on<MovieListEvent>(
       (event, emit) async {
         if (event is MovieListEventLoadNextPage) {
-          // await onAuthCheckStatusEvent(event, emit);
+          await onMovieListEventLoadNextPage(event, emit);
         } else if (event is MovieListEventLoadReset) {
-          // await onAuthLoginEvent(event, emit);
+          await onMovieListEventLoadReset(event, emit);
         } else if (event is MovieListEventLoadSearchMovie) {
-          // await onAuthLogoutEvent(event, emit);
+          await onMovieListEventLoadSearchMovie(event, emit);
         }
       },
       transformer: sequential(),
@@ -77,12 +130,56 @@ class MovieListBloc extends Bloc<MovieListEvent, MovieListState> {
     Emitter<MovieListState> emit,
   ) async {
     if (state.isSearchMode) {
-      // await _searchMoviePaginator.loadNextPage();
+      final container = await _loadNextPage(
+        state.searchMovieContainer,
+        (nextPage) async {
+          final result = await _movieApiClient.searchMovie(
+            nextPage,
+            event.locale,
+            state.searchQuery,
+            Configuration.apiKey,
+          );
+          return result;
+        },
+      );
+      if (container != null) {
+        final newState = state.copyWith(searchMovieContainer: container);
+        emit(newState);
+      }
     } else {
-      if (state.popularMovieContainer.isComplete) return;
-      final nextPage = state.popularMovieContainer.currentPage + 1;
-       final result = await
+      final container = await _loadNextPage(
+        state.popularMovieContainer,
+        (nextPage) async {
+          final result = await _movieApiClient.popularMovie(
+            nextPage,
+            event.locale,
+            Configuration.apiKey,
+          );
+          return result;
+        },
+      );
+      if (container != null) {
+        final newState = state.copyWith(searchMovieContainer: container);
+        emit(newState);
+      }
     }
+  }
+
+  Future<MovieListContainer?> _loadNextPage(
+    MovieListContainer container,
+    Future<PopularMovieResponse> Function(int) loader,
+  ) async {
+    if (container.isComplete) return null;
+    final nextPage = container.currentPage + 1;
+    final result = await loader(nextPage);
+    final movies = container.movies;
+    movies.addAll(result.movies);
+    final newContainer = container.copyWith(
+      movies: movies,
+      currentPage: result.page,
+      totalPage: result.totalPages,
+    );
+    return newContainer;
   }
 
   Future<void> onMovieListEventLoadReset(
@@ -90,11 +187,17 @@ class MovieListBloc extends Bloc<MovieListEvent, MovieListState> {
     Emitter<MovieListState> emit,
   ) async {
     emit(const MovieListState.initial());
-    add(MovieListEventLoadNextPage());
   }
 
   Future<void> onMovieListEventLoadSearchMovie(
     MovieListEventLoadSearchMovie event,
     Emitter<MovieListState> emit,
-  ) async {}
+  ) async {
+    if (state.searchQuery == event.query) return;
+    final newState = state.copyWith(
+      searchQuery: event.query,
+      searchMovieContainer: const MovieListContainer.initial(),
+    );
+    emit(newState);
+  }
 }
