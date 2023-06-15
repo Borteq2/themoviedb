@@ -2,9 +2,9 @@ import 'package:themoviedb/di_examples/ui/widgets/calculator_service.dart';
 import 'package:themoviedb/di_examples/ui/widgets/example_widget.dart';
 
 class ExampleCalcViewModel implements ExampleViewModel {
-  final calculatorService = const CalculatorService();
+  final CalculatorService calculatorService;
+  const ExampleCalcViewModel(this.calculatorService);
 
-  const ExampleCalcViewModel();
 
   @override
   void onPressMe() {
@@ -15,6 +15,7 @@ class ExampleCalcViewModel implements ExampleViewModel {
     );
     print(result);
   }
+
   @override
   void onPressMe2() {
     final result = calculatorService.calculate(
@@ -26,13 +27,14 @@ class ExampleCalcViewModel implements ExampleViewModel {
   }
 }
 
-class ExamplePetViewModel implements ExampleViewModel{
+class ExamplePetViewModel implements ExampleViewModel {
   const ExamplePetViewModel();
 
   @override
   void onPressMe() {
     print('гав гав');
   }
+
   @override
   void onPressMe2() {
     print('мяу мяу');

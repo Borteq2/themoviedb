@@ -6,12 +6,15 @@ import 'package:themoviedb/ui/navigation/main_navigation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  // final ExampleCalcViewModel viewModel;
+  final Widget widget;
+  const MyApp({Key? key, required this.widget}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: ExampleWidget(model: ExampleCalcViewModel()),
+      // home: ExampleWidget(model: viewModel),
+      home: widget,
     );
   }
 }
