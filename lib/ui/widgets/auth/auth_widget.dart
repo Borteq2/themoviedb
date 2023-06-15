@@ -18,7 +18,7 @@ class AuthWidget extends StatelessWidget {
     return BlocListener<AuthViewCubit, AuthViewCubitState>(
       listener: _onAuthViewCubitStateChange,
       child: Provider(
-        create: (_) => _AuthDataStorage,
+        create: (_) => _AuthDataStorage(),
         child: Scaffold(
           appBar: AppBar(
             title: const Text('Login to your account'),

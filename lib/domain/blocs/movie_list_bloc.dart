@@ -162,7 +162,7 @@ class MovieListBloc extends Bloc<MovieListEvent, MovieListState> {
         },
       );
       if (container != null) {
-        final newState = state.copyWith(searchMovieContainer: container);
+        final newState = state.copyWith(popularMovieContainer: container);
         emit(newState);
       }
     }
