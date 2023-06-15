@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/di_examples/ui/widgets/example_view_model.dart';
-import 'package:themoviedb/di_examples/ui/widgets/example_widget.dart';
-import 'package:themoviedb/ui/Theme/app_colors.dart';
-import 'package:themoviedb/ui/navigation/main_navigation.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+
+abstract class MainNavigation {
+  Map<String, Widget Function(BuildContext)> makeRoutes();
+  Route<Object> onGenerateRoute(RouteSettings settings);
+}
 
 class MyApp extends StatelessWidget {
   // final ExampleCalcViewModel viewModel;
-  final Widget widget;
-  const MyApp({Key? key, required this.widget}) : super(key: key);
+  final MainNavigation mainNavigation;
+  const MyApp({Key? key, required this.mainNavigation}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       // home: ExampleWidget(model: viewModel),
-      home: widget,
+      routes: mainNavigation.makeRoutes(),
+      onGenerateRoute: mainNavigation.onGenerateRoute,
     );
   }
 }
