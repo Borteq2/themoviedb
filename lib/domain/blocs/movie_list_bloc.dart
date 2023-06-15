@@ -46,10 +46,13 @@ class MovieListContainer {
       identical(this, other) ||
       other is MovieListContainer &&
           runtimeType == other.runtimeType &&
+          currentPage == other.currentPage &&
+          totalPage == other.totalPage &&
           movies == other.movies;
 
   @override
-  int get hashCode => movies.hashCode;
+  int get hashCode =>
+      movies.hashCode ^ currentPage.hashCode ^ totalPage.hashCode;
 
   MovieListContainer copyWith({
     List<Movie>? movies,
@@ -103,17 +106,24 @@ class MovieListState {
       identical(this, other) ||
       other is MovieListState &&
           runtimeType == other.runtimeType &&
-          searchMovieContainer == other.searchMovieContainer;
+          popularMovieContainer == other.popularMovieContainer &&
+          searchMovieContainer == other.searchMovieContainer &&
+          searchQuery == other.searchQuery;
 
   @override
-  int get hashCode => searchMovieContainer.hashCode;
+  int get hashCode =>
+      searchMovieContainer.hashCode ^
+      popularMovieContainer.hashCode ^
+      searchQuery.hashCode;
 }
 
 class MovieListBloc extends Bloc<MovieListEvent, MovieListState> {
   final _movieApiClient = MovieApiClient();
 
   // 99 20:20
-  MovieListBloc(super.initialState) {
+  MovieListBloc(
+    MovieListState initialState,
+  ) : super(initialState) {
     on<MovieListEvent>(
       (event, emit) async {
         if (event is MovieListEventLoadNextPage) {
