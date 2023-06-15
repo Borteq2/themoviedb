@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:themoviedb/di_examples/ui/widgets/example_view_model.dart';
 import 'package:themoviedb/di_examples/ui/widgets/example_widget.dart';
 import 'package:themoviedb/ui/Theme/app_colors.dart';
 import 'package:themoviedb/ui/navigation/main_navigation.dart';
@@ -10,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: ExampleWidget(),
+      home: ExampleWidget(model: ExampleCalcViewModel()),
     );
   }
 }

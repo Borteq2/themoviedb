@@ -10,7 +10,7 @@ class CalculatorService {
   const CalculatorService();
     int calculate(int a, int b, CalculatorServiceOperation operation) {
       if (operation == CalculatorServiceOperation.sum) {
-        return a + b;
+        return summator.sum(a, b);
       } else {
         return 0;
       }
