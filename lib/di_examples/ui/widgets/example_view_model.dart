@@ -1,9 +1,10 @@
+import 'package:themoviedb/di_examples/factories/di_container.dart';
 import 'package:themoviedb/di_examples/ui/widgets/calculator_service.dart';
 import 'package:themoviedb/di_examples/ui/widgets/example_widget.dart';
 
 class ExampleCalcViewModel implements ExampleViewModel {
-  final CalculatorService calculatorService;
-  const ExampleCalcViewModel(this.calculatorService);
+  final calculatorService = ServiceLocator.instance.makeCalculatorService();
+  ExampleCalcViewModel();
 
 
   @override

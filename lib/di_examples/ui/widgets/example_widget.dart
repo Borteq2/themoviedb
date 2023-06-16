@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:themoviedb/di_examples/factories/di_container.dart';
 
 abstract class ExampleViewModel {
   void onPressMe();
@@ -6,15 +8,15 @@ abstract class ExampleViewModel {
 }
 
 class ExampleWidget extends StatelessWidget {
-  final ExampleViewModel model;
+  // final ExampleViewModel model = ServiceLocator.instance.makeExampleViewModel();
 
   const ExampleWidget({
     Key? key,
-    required this.model,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final model = context.read<ExampleViewModel>();
     return Scaffold(
       body: SafeArea(
         child: Center(
