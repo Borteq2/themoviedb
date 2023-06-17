@@ -1,30 +1,36 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:themoviedb/domain/api_client/api_client_exception.dart';
-import 'package:themoviedb/domain/services/auth_service.dart';
-import 'package:themoviedb/ui/navigation/main_navigation.dart';
+import 'package:themoviedb/ui/navigation/main_navigation_actions.dart';
+
+abstract class AuthViewModelLoginProvider {
+  Future<void> login(String login, String password);
+}
 
 class AuthViewModel extends ChangeNotifier {
-  final _authService = AuthService();
+  final MainNavigationAction mainNavigationAction;
+  final AuthViewModelLoginProvider loginProvider;
 
   final loginTextController = TextEditingController();
   final passwordTextController = TextEditingController();
 
   String? _errorMessage;
   bool _isAuthProgress = false;
-
   String? get errorMessage => _errorMessage;
-
   bool get canStartAuth => !_isAuthProgress;
-
   bool get isAuthProgress => _isAuthProgress;
+
+  AuthViewModel({
+    required this.mainNavigationAction,
+    required this.loginProvider,
+  });
 
   bool _isValid(String login, String password) =>
       login.isNotEmpty || password.isNotEmpty;
 
   Future<String?> _login(String login, String password) async {
     try {
-      await _authService.login(login, password);
+      await loginProvider.login(login, password);
     } on ApiClientException catch (e) {
       switch (e.type) {
         case ApiClientExceptionType.network:
@@ -54,7 +60,7 @@ class AuthViewModel extends ChangeNotifier {
 
     _errorMessage = await _login(login, password);
     if (_errorMessage == null) {
-      MainNavigation.resetNavigation(context);
+      mainNavigationAction.resetNavigation(context);
     } else {
       _updateState(_errorMessage, false);
     }

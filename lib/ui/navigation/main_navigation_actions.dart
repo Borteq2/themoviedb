@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:themoviedb/ui/navigation/main_navigation_route_names.dart';
 
 class MainNavigationAction {
-  const MainNavigationAction._();
-  static const instance = MainNavigationAction._();
+  const MainNavigationAction();
 
 
   void resetNavigation(BuildContext context) {

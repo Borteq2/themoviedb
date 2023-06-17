@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/domain/factories/screen_factory.dart';
 
 class MainScreenWidget extends StatefulWidget {
   const MainScreenWidget({Key? key}) : super(key: key);
