@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/di/di_container.dart';
-import 'package:themoviedb/ui/widgets/app/my_app.dart';
+import 'package:get_it/get_it.dart';
+import 'package:themoviedb/di_examples/factories/di_container.dart';
 
 abstract class AppFactory {
   Widget makeApp();
 }
 
-final appFactory = makeAppFactory();
-
 void main() {
+  setupGetIt();
+  final appFactory = GetIt.I<AppFactory>();
   final app = appFactory.makeApp();
   runApp(app);
 }

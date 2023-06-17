@@ -1,16 +1,17 @@
 
+
+import 'package:get_it/get_it.dart';
 import 'package:themoviedb/di_examples/ui/widgets/summator.dart';
 
-enum CalculatorServiceOperation{
-  sum
-}
+enum CalculatorServiceOperation{ sum }
 
 class CalculatorService {
-  final summator = const Summator();
-  const CalculatorService();
+  final summator = GetIt.I<Summator>();
+
+  CalculatorService();
     int calculate(int a, int b, CalculatorServiceOperation operation) {
       if (operation == CalculatorServiceOperation.sum) {
-        return a + b;
+        return summator.sum(a, b);
       } else {
         return 0;
       }
