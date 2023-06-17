@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:themoviedb/di_examples/factories/di_container.dart';
-import 'package:themoviedb/di_examples/ui/widgets/example_view_model.dart';
-import 'package:themoviedb/di_examples/ui/widgets/example_widget.dart';
+import 'package:get_it/get_it.dart';
+
 
 abstract class MainNavigation {
   Map<String, Widget Function(BuildContext)> makeRoutes();
@@ -10,18 +8,15 @@ abstract class MainNavigation {
 }
 
 class MyApp extends StatelessWidget {
-  final mainNavigation = ServiceLocator.instance.mainNavigation;
+  final mainNavigation = GetIt.I<MainNavigation>();
   MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Provider<ExampleViewModel>(
-      create: (_) => ExampleCalcViewModel(),
-      child: MaterialApp(
-        // home: ExampleWidget(model: viewModel),
-        routes: mainNavigation.makeRoutes(),
-        onGenerateRoute: mainNavigation.onGenerateRoute,
-      ),
+    return MaterialApp(
+      // home: ExampleWidget(model: viewModel),
+      routes: mainNavigation.makeRoutes(),
+      onGenerateRoute: mainNavigation.onGenerateRoute,
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:themoviedb/di_examples/factories/di_container.dart';
 
@@ -16,7 +17,7 @@ class ExampleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.read<ExampleViewModel>();
+    final model = GetIt.I<ExampleViewModel>();
     return Scaffold(
       body: SafeArea(
         child: Center(

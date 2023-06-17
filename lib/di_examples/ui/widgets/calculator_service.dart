@@ -1,10 +1,12 @@
 
-import 'package:themoviedb/di_examples/factories/di_container.dart';
+
+import 'package:get_it/get_it.dart';
+import 'package:themoviedb/di_examples/ui/widgets/summator.dart';
 
 enum CalculatorServiceOperation{ sum }
 
 class CalculatorService {
-  final summator = ServiceLocator.instance.makeSummator();
+  final summator = GetIt.I<Summator>();
 
   CalculatorService();
     int calculate(int a, int b, CalculatorServiceOperation operation) {

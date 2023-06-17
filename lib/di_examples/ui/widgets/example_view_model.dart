@@ -1,9 +1,9 @@
-import 'package:themoviedb/di_examples/factories/di_container.dart';
+import 'package:get_it/get_it.dart';
 import 'package:themoviedb/di_examples/ui/widgets/calculator_service.dart';
 import 'package:themoviedb/di_examples/ui/widgets/example_widget.dart';
 
 class ExampleCalcViewModel implements ExampleViewModel {
-  final calculatorService = ServiceLocator.instance.makeCalculatorService();
+  final calculatorService = GetIt.I<CalculatorService>();
   ExampleCalcViewModel();
 
 
