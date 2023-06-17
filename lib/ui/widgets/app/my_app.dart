@@ -3,14 +3,22 @@ import 'package:themoviedb/ui/Theme/app_colors.dart';
 import 'package:themoviedb/ui/navigation/main_navigation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-class MyApp extends StatelessWidget {
-  static final mainNavigation = MainNavigation();
+abstract class MyAppNavigation {
+  Map<String, Widget Function(BuildContext)> get routes;
+  Route<Object> onGenerateRoute(RouteSettings settings);
+}
 
-  const MyApp({super.key});
+class MyApp extends StatelessWidget {
+
+  final MyAppNavigation navigation;
+
+  const MyApp({
+    Key? key,
+    required this.navigation,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -32,9 +40,9 @@ class MyApp extends StatelessWidget {
         Locale('ru', 'RU'),
         Locale('en', 'US'),
       ],
-      routes: mainNavigation.routes,
+      routes: navigation.routes,
       initialRoute: MainNavigationRouteNames.loaderWidget,
-      onGenerateRoute: mainNavigation.onGenerateRoute,
+      onGenerateRoute: navigation.onGenerateRoute,
     );
   }
 }
