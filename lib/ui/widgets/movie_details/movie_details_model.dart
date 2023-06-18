@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:themoviedb/domain/api_client/api_client_exception.dart';
 import 'package:themoviedb/domain/entity/movie_details.dart';
-import 'package:themoviedb/domain/services/auth_service.dart';
-import 'package:themoviedb/domain/services/movie_service.dart';
+import 'package:themoviedb/domain/local_entity/movie_details_local.dart';
 import 'package:themoviedb/library/localized_model_storage.dart';
-import 'package:themoviedb/ui/navigation/main_navigation.dart';
+import 'package:themoviedb/ui/navigation/main_navigation_actions.dart';
 
 class MovieDetailsPosterData {
   final String? backdropPath;
@@ -83,7 +82,7 @@ class MovieDetailsData {
   String summary = '';
   List<MovieDetailsActorData> actorsData = <MovieDetailsActorData>[];
   List<List<MovieDetailsMoviePeopleData>> peopleData =
-  <List<MovieDetailsMoviePeopleData>>[];
+      <List<MovieDetailsMoviePeopleData>>[];
   MovieDetailsPosterData posterData = MovieDetailsPosterData();
   MovieDetailsMovieNameData nameData = MovieDetailsMovieNameData(
     name: '',
@@ -92,21 +91,42 @@ class MovieDetailsData {
   MovieDetailsScoreData scoreData = MovieDetailsScoreData(voteAverage: 0);
 }
 
-class MovieDetailsModel extends ChangeNotifier {
+abstract class MovieDetailsMovieLogoutProvider {
+  Future<void> logout();
+}
 
-  final _authService = AuthService();
-  final _movieService = MovieService();
+abstract class MovieDetailsMovieProvider {
+  Future<MovieDetailsLocal> loadDetails({
+    required int movieId,
+    required String locale,
+  });
+
+  Future<void> updateFavorite({
+    required int movieId,
+    required bool isFavorite,
+  });
+}
+
+class MovieDetailsModel extends ChangeNotifier {
+  final MovieDetailsMovieLogoutProvider logoutProvider;
+  final MovieDetailsMovieProvider movieDetailsMovieProvider;
+  final MainNavigationAction navigationAction;
   final int movieId;
   final data = MovieDetailsData();
   final _localeStorage = LocalizedModelStorage();
-  late DateFormat _dateFormat;  
-  
-  MovieDetailsModel(this.movieId);
+  late DateFormat _dateFormat;
+
+  MovieDetailsModel(
+    this.movieId, {
+    required this.movieDetailsMovieProvider,
+    required this.logoutProvider,
+    required this.navigationAction,
+  });
 
   Future<void>? Function()? onSessionExpired;
 
   Future<void> setupLocale(BuildContext context, Locale locale) async {
-    if(!_localeStorage.updateLocale(locale)) return;
+    if (!_localeStorage.updateLocale(locale)) return;
     _dateFormat = DateFormat.yMMMd(_localeStorage.localeTag);
     updateData(null, false);
     await loadDetails(context);
@@ -139,12 +159,11 @@ class MovieDetailsModel extends ChangeNotifier {
     data.summary = makeSummary(details);
     data.peopleData = makePeopleData(details);
     data.actorsData = details.credits.cast
-        .map((e) =>
-        MovieDetailsActorData(
-          name: e.name,
-          character: e.character,
-          profilePath: e.profilePath,
-        ))
+        .map((e) => MovieDetailsActorData(
+              name: e.name,
+              character: e.character,
+              profilePath: e.profilePath,
+            ))
         .toList();
     notifyListeners();
   }
@@ -167,7 +186,7 @@ class MovieDetailsModel extends ChangeNotifier {
 
   Future<void> loadDetails(BuildContext context) async {
     try {
-      final details = await _movieService.loadDetails(
+      final details = await movieDetailsMovieProvider.loadDetails(
         movieId: movieId,
         locale: _localeStorage.localeTag,
       );
@@ -182,7 +201,7 @@ class MovieDetailsModel extends ChangeNotifier {
         data.posterData.copyWith(isFavorite: !data.posterData.isFavorite);
     notifyListeners();
     try {
-      await _movieService.updateFavorite(
+      await movieDetailsMovieProvider.updateFavorite(
         isFavorite: data.posterData.isFavorite,
         movieId: movieId,
       );
@@ -218,12 +237,12 @@ class MovieDetailsModel extends ChangeNotifier {
     return texts.join(' ');
   }
 
-  void _handleApiClientException(ApiClientException exception,
-      BuildContext context) {
+  void _handleApiClientException(
+      ApiClientException exception, BuildContext context) {
     switch (exception.type) {
       case ApiClientExceptionType.sessionExpired:
-        _authService.logout();
-        MainNavigation.resetNavigation(context);
+        logoutProvider.logout();
+        navigationAction.resetNavigation(context);
       default:
         print(exception);
     }

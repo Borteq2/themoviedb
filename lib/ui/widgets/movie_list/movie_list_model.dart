@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:themoviedb/domain/entity/movie.dart';
+import 'package:themoviedb/domain/entity/popular_movie_response.dart';
 import 'package:themoviedb/domain/services/movie_service.dart';
 import 'package:themoviedb/library/localized_model_storage.dart';
 import 'package:themoviedb/library/paginator.dart';
 import 'package:themoviedb/ui/navigation/main_navigation.dart';
+import 'package:themoviedb/ui/navigation/main_navigation_route_names.dart';
 
 class MovieListRowData {
   final int id;
@@ -24,8 +26,21 @@ class MovieListRowData {
   });
 }
 
+abstract class MovieListViewModelMoviesProvider {
+  Future<PopularMovieResponse> popularMovie(
+    int page,
+    String locale,
+  );
+
+  Future<PopularMovieResponse> searchMovie(
+    int page,
+    String locale,
+    String query,
+  );
+}
+
 class MovieListViewModel extends ChangeNotifier {
-  final _movieService = MovieService();
+  final MovieListViewModelMoviesProvider moviesProvider;
   late final Paginator<Movie> _popularMoviePaginator;
   late final Paginator<Movie> _searchMoviePaginator;
   Timer? searchDebounce;
@@ -41,9 +56,10 @@ class MovieListViewModel extends ChangeNotifier {
     return searchQuery != null && searchQuery.isNotEmpty;
   }
 
-  MovieListViewModel() {
+  MovieListViewModel(this.moviesProvider) {
     _popularMoviePaginator = Paginator<Movie>((page) async {
-      final result = await _movieService.popularMovie(page, _localeStorage.localeTag);
+      final result =
+          await moviesProvider.popularMovie(page, _localeStorage.localeTag);
       return PaginatorLoadResult(
         data: result.movies,
         currentPage: result.page,
@@ -51,8 +67,8 @@ class MovieListViewModel extends ChangeNotifier {
       );
     });
     _searchMoviePaginator = Paginator<Movie>((page) async {
-      final result =
-          await _movieService.searchMovie(page, _localeStorage.localeTag, _searchQuery ?? '');
+      final result = await moviesProvider.searchMovie(
+          page, _localeStorage.localeTag, _searchQuery ?? '');
       return PaginatorLoadResult(
         data: result.movies,
         currentPage: result.page,
@@ -62,7 +78,7 @@ class MovieListViewModel extends ChangeNotifier {
   }
 
   Future<void> setupLocale(Locale locale) async {
-    if(!_localeStorage.updateLocale(locale)) return;
+    if (!_localeStorage.updateLocale(locale)) return;
     _dateFormat = DateFormat.yMMMd(_localeStorage.localeTag);
     await _resetList();
   }

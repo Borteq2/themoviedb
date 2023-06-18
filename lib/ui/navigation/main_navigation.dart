@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/domain/factories/screen_factory.dart';
 import 'package:themoviedb/ui/navigation/main_navigation_route_names.dart';
 import 'package:themoviedb/ui/widgets/app/my_app.dart';
 

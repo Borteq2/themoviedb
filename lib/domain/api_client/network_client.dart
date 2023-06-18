@@ -3,12 +3,27 @@ import 'dart:io';
 
 import 'package:themoviedb/configuration/configuration.dart';
 import 'package:themoviedb/domain/api_client/api_client_exception.dart';
+import 'package:themoviedb/library/app_http_client.dart';
 
+abstract class NetworkClient {
+  Future<T> get<T>(
+      String path,
+      T Function(dynamic json) parser, [
+        Map<String, dynamic>? parameters,
+      ]);
 
+  Future<T> post<T>(
+      String path,
+      T Function(dynamic json) parser,
+      Map<String, dynamic> bodyParameters, [
+        Map<String, dynamic>? urlParameters,
+      ]);
+}
 
-class NetworkClient {
+class NetworkClientDefault implements NetworkClient{
+  const NetworkClientDefault(this.client);
 
-  final _client = HttpClient();
+  final AppHttpClient client;
 
   Uri _makeUri(String path, [Map<String, dynamic>? parameters]) {
     final uri = Uri.parse('${Configuration.host}$path');
@@ -26,7 +41,7 @@ class NetworkClient {
       ]) async {
     final url = _makeUri(path, parameters);
     try {
-      final request = await _client.getUrl(url);
+      final request = await client.getUrl(url);
       final response = await request.close();
       final dynamic json = (await response.jsonDecode());
 
@@ -51,7 +66,7 @@ class NetworkClient {
       ]) async {
     try {
       final url = _makeUri(path, urlParameters);
-      final request = await _client.postUrl(url);
+      final request = await client.postUrl(url);
 
       request.headers.contentType = ContentType.json;
       request.write(jsonEncode(bodyParameters));

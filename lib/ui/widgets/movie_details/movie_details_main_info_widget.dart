@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:themoviedb/domain/api_client/image_downloader.dart';
-import 'package:themoviedb/ui/navigation/main_navigation.dart';
+import 'package:themoviedb/ui/navigation/main_navigation_route_names.dart';
 import 'package:themoviedb/ui/widgets/movie_details/movie_details_model.dart';
+import 'package:themoviedb/ui/widgets/user_rate_widget.dart';
 
-import '../user_rate_widget.dart';
 
 class MovieDetailsMainInfoWidget extends StatelessWidget {
   const MovieDetailsMainInfoWidget({Key? key}) : super(key: key);

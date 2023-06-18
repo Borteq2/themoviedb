@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:themoviedb/ui/navigation/main_navigation.dart';
 
 class MainScreenWidget extends StatefulWidget {
-  const MainScreenWidget({Key? key}) : super(key: key);
+  final ScreenFactory screenFactory;
+
+  const MainScreenWidget({
+    Key? key,
+    required this.screenFactory,
+  }) : super(key: key);
+
 
   @override
   State<MainScreenWidget> createState() => _MainScreenWidgetState();
@@ -9,7 +16,6 @@ class MainScreenWidget extends StatefulWidget {
 
 class _MainScreenWidgetState extends State<MainScreenWidget> {
   int _selectedTab = 0;
-  final _screenFactory = ScreenFactory();
 
   void onSelectTab(int index) {
     if (_selectedTab == index) return;
@@ -34,9 +40,9 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
       body: IndexedStack(
         index: _selectedTab,
         children: [
-          _screenFactory.makeNewsList(),
-          _screenFactory.makeMovieList(),
-          _screenFactory.makeTvShowList(),
+          widget.screenFactory.makeNewsList(),
+          widget.screenFactory.makeMovieList(),
+          widget.screenFactory.makeTvShowList(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
