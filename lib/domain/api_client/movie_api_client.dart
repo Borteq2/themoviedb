@@ -3,9 +3,34 @@ import 'package:themoviedb/domain/api_client/network_client.dart';
 import 'package:themoviedb/domain/entity/movie_details.dart';
 import 'package:themoviedb/domain/entity/popular_movie_response.dart';
 
-class MovieApiClient {
-  final _networkClient = NetworkClient();
+abstract class MovieApiClient {
+  Future<PopularMovieResponse> popularMovie(
+    int page,
+    String locale,
+    String apiKey,
+  );
 
+  Future<PopularMovieResponse> searchMovie(
+    int page,
+    String locale,
+    String query,
+    String apiKey,
+  );
+
+  Future<MovieDetails> movieDetails(
+    int movieId,
+    String locale,
+  );
+
+  Future<bool> isFavorite(int movieId, String sessionId);
+}
+
+class MovieApiClientDefault implements MovieApiClient {
+  final NetworkClient networkClient;
+
+  const MovieApiClientDefault(this.networkClient);
+
+  @override
   Future<PopularMovieResponse> popularMovie(
     int page,
     String locale,
@@ -17,7 +42,7 @@ class MovieApiClient {
       return response;
     }
 
-    final result = _networkClient.get(
+    final result = networkClient.get(
       '/movie/popular',
       parser,
       <String, dynamic>{
@@ -29,6 +54,7 @@ class MovieApiClient {
     return result;
   }
 
+  @override
   Future<MovieDetails> movieDetails(
     int movieId,
     String locale,
@@ -39,7 +65,7 @@ class MovieApiClient {
       return response;
     }
 
-    final result = _networkClient.get(
+    final result = networkClient.get(
       '/movie/$movieId',
       parser,
       <String, dynamic>{
@@ -51,6 +77,7 @@ class MovieApiClient {
     return result;
   }
 
+  @override
   Future<bool> isFavorite(int movieId, String sessionId) async {
     bool parser(dynamic json) {
       final jsonMap = json as Map<String, dynamic>;
@@ -58,7 +85,7 @@ class MovieApiClient {
       return result;
     }
 
-    final result = _networkClient.get(
+    final result = networkClient.get(
       '/movie/$movieId/account_states',
       parser,
       <String, dynamic>{
@@ -69,6 +96,7 @@ class MovieApiClient {
     return result;
   }
 
+  @override
   Future<PopularMovieResponse> searchMovie(
     int page,
     String locale,
@@ -81,7 +109,7 @@ class MovieApiClient {
       return response;
     }
 
-    final result = _networkClient.get(
+    final result = networkClient.get(
       '/search/movie',
       parser,
       <String, dynamic>{
